@@ -105,50 +105,66 @@ async function preloadMedia() {
         DOM.progressBar.style.strokeDashoffset = offset;
     }
 
-    // Função para baixar uma mídia individual usando fetch com ReadableStream
-    async function downloadFile(file) {
-        try {
-            const response = await fetch(file.url);
-            if (!response.ok) throw new Error(`Network response error for ${file.url}`);
+    // Função para baixar uma mídia individual usando XMLHttpRequest (estável no iOS e com controle de erro robusto)
+    function downloadFile(file) {
+        return new Promise((resolve) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", file.url, true);
+            xhr.responseType = "blob";
             
-            // Tenta obter o tamanho do cabeçalho da resposta. Caso contrário, usa o tamanho esperado da configuração.
-            const contentLength = response.headers.get('content-length');
-            const fileTotalBytes = contentLength ? parseInt(contentLength, 10) : file.size;
-            
-            const reader = response.body.getReader();
-            let receivedBytes = 0;
-            const chunks = [];
-            
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                
-                chunks.push(value);
-                receivedBytes += value.length;
-                
-                // Mapeia o progresso deste arquivo proporcionalmente ao tamanho real ou esperado
-                loadedBytesMap[file.id] = Math.min(file.size, (receivedBytes / fileTotalBytes) * file.size);
+            // Define timeout de 25 segundos para conexões lentas móveis
+            xhr.timeout = 25000;
+
+            xhr.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    loadedBytesMap[file.id] = Math.min(file.size, (event.loaded / event.total) * file.size);
+                } else {
+                    loadedBytesMap[file.id] = Math.min(file.size, event.loaded);
+                }
                 updateProgress();
-            }
-            
-            // Concatena as partes do arquivo e cria a Blob URL correspondente
-            const blob = new Blob(chunks);
-            blobUrls[file.id] = URL.createObjectURL(blob);
-        } catch (error) {
-            console.error(`Erro ao carregar mídia ${file.id}:`, error);
-            // Fallback imediato: se falhar o fetch customizado, assume 100% de progresso para o arquivo e usa o caminho local normal
-            loadedBytesMap[file.id] = file.size;
-            blobUrls[file.id] = file.url;
-            updateProgress();
-        }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300 && xhr.response) {
+                    const blob = xhr.response;
+                    blobUrls[file.id] = URL.createObjectURL(blob);
+                } else {
+                    console.warn(`Erro HTTP ${xhr.status} ao carregar ${file.url}. Usando fallback.`);
+                    blobUrls[file.id] = file.url; // Fallback para URL direta
+                }
+                loadedBytesMap[file.id] = file.size;
+                updateProgress();
+                resolve();
+            };
+
+            xhr.onerror = function() {
+                console.error(`Erro de rede ao carregar ${file.url}. Usando fallback.`);
+                blobUrls[file.id] = file.url; // Fallback para URL direta
+                loadedBytesMap[file.id] = file.size;
+                updateProgress();
+                resolve();
+            };
+
+            xhr.ontimeout = function() {
+                console.warn(`Timeout ao carregar ${file.url}. Usando fallback.`);
+                blobUrls[file.id] = file.url; // Fallback para URL direta
+                loadedBytesMap[file.id] = file.size;
+                updateProgress();
+                resolve();
+            };
+
+            xhr.send();
+        });
     }
 
     // Executa o download de todas as mídias em paralelo
     const downloadPromises = CONFIG.mediaFiles.map(file => downloadFile(file));
     await Promise.all(downloadPromises);
     
-    // Garante que a barra mostre 100% no final
-    loadedBytesMap[CONFIG.mediaFiles[0].id] = CONFIG.mediaFiles[0].size; // Forçar
+    // Garante que todos marquem 100% no fim
+    CONFIG.mediaFiles.forEach(file => {
+        loadedBytesMap[file.id] = file.size;
+    });
     updateProgress();
     
     // Pequena pausa para sensação visual agradável antes de liberar
