@@ -717,28 +717,38 @@ function copyPixKey() {
    GERAÇÃO DE PARTÍCULAS CSS DE CORAÇÃO E LUZ
    ========================================================================== */
 function createParticles() {
-    const particleCount = 20;
+    const particleCount = 25; // Levemente maior devido à delicadeza e menor tamanho das partículas
+    const types = ["dust", "sparkle", "star"];
     
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement("div");
         particle.classList.add("particle");
         
-        // Tamanho aleatório (entre 4px e 12px)
-        const size = Math.random() * 8 + 4;
+        // Define o tipo aleatório
+        const type = types[Math.floor(Math.random() * types.length)];
+        particle.classList.add(`particle-${type}`);
+        
+        // Tamanho baseado no tipo
+        let size = 0;
+        if (type === "dust") {
+            size = Math.random() * 2 + 1.5; // Poeira fina: 1.5px a 3.5px
+        } else if (type === "sparkle") {
+            size = Math.random() * 5 + 4.5; // Brilho de 4 pontas: 4.5px a 9.5px
+        } else {
+            size = Math.random() * 3 + 2.5; // Estrela suave: 2.5px a 5.5px
+        }
+        
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
         
-        // Posição inicial horizontal aleatória (%)
+        // Posição horizontal inicial (%)
         particle.style.left = `${Math.random() * 100}%`;
         
-        // Atraso de animação aleatório (entre 0 e 10s) para as partículas subirem em momentos diferentes
-        particle.style.animationDelay = `${Math.random() * 10}s`;
+        // Atraso de animação aleatório (dispersão suave no tempo)
+        particle.style.animationDelay = `${Math.random() * 15}s`;
         
-        // Duração da animação aleatória (entre 8s e 15s)
-        particle.style.animationDuration = `${Math.random() * 7 + 8}s`;
-        
-        // Opacidade inicial aleatória
-        particle.style.opacity = Math.random() * 0.5 + 0.2;
+        // Duração de animação bem lenta (entre 18s e 28s)
+        particle.style.animationDuration = `${Math.random() * 10 + 18}s`;
         
         // Adiciona ao container
         DOM.particlesContainer.appendChild(particle);
