@@ -434,9 +434,11 @@ function setupEventListeners() {
     });
     
     // Copiar chave PIX
-    DOM.btnCopyPix.addEventListener("click", () => {
-        copyPixKey();
-    });
+    if (DOM.btnCopyPix) {
+        DOM.btnCopyPix.addEventListener("click", () => {
+            copyPixKey();
+        });
+    }
 }
 
 // Controle de mudo
