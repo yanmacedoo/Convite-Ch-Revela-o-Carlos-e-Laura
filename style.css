@@ -1310,7 +1310,7 @@ html, body {
    ========================================================================== */
 .countdown-container {
     position: absolute;
-    top: 71.5%; /* Centralizado verticalmente na faixa bege clara entre o texto e os ursinhos */
+    top: 72.3%; /* Centralizado exatamente no meio entre o box marrom e as orelhas dos ursos */
     left: 50%;
     transform: translate(-50%, -50%);
     width: auto; /* Largura automática para ficar compacto */
@@ -1332,7 +1332,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.4vh; /* Menos espaço de separação horizontal */
+    gap: 0.5vh; /* Espaçamento horizontal elegante */
     width: 100%;
 }
 
@@ -1340,19 +1340,19 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 2.8vh; /* Largura mínima menor para condensar */
+    min-width: 3.2vh; /* Largura mínima proporcional ao novo tamanho */
 }
 
 .countdown-item span {
     font-family: var(--font-accent);
-    font-size: 1.25vh; /* Fonte compacta e delicada */
+    font-size: 1.5vh; /* Aumentado ligeiramente para melhor legibilidade */
     font-weight: 700;
     color: var(--color-text-main);
     line-height: 1.1;
 }
 
 .countdown-item label {
-    font-size: 0.5vh; /* Rótulo super discreto */
+    font-size: 0.6vh; /* Rótulo proporcional */
     text-transform: uppercase;
     letter-spacing: 0.2px;
     color: var(--color-gold-dark);
@@ -1362,7 +1362,7 @@ html, body {
 
 .countdown-separator {
     font-family: var(--font-accent);
-    font-size: 1.0vh; /* Separador menor */
+    font-size: 1.25vh; /* Separador proporcional */
     font-weight: 600;
     color: var(--color-gold-dark);
     align-self: flex-start;
