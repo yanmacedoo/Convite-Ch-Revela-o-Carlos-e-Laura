@@ -65,6 +65,7 @@ function initDOMReferences() {
     DOM.pixKeyText = document.getElementById("pix-key-text");
     
     DOM.particlesContainer = document.getElementById("particles-js");
+    DOM.transitionOverlay = document.getElementById("white-transition-overlay");
 }
 
 /* ==========================================================================
@@ -219,9 +220,10 @@ function transitionToEnvelope() {
 
 // Transição do envelope para o vídeo
 function startInvitationFlow() {
-    // Configura o áudio e vídeo com os Blob URLs corretos
-    DOM.introVideo.src = blobUrls["video"];
-    DOM.bgMusic.src = blobUrls["music"];
+    // Configura o áudio e vídeo com as URLs diretas de rede para compatibilidade total com o iOS
+    // Como o preloader já baixou os arquivos, o navegador servirá do cache instantaneamente
+    DOM.introVideo.src = CONFIG.mediaFiles.find(f => f.id === "video").url;
+    DOM.bgMusic.src = CONFIG.mediaFiles.find(f => f.id === "music").url;
     
     // Configura volumes iniciais
     DOM.bgMusic.volume = 0.5;
@@ -242,27 +244,42 @@ function startInvitationFlow() {
     };
 }
 
-// Transição do vídeo para o convite principal
+// Transição do vídeo para o convite principal (com fade em branco suave)
 function transitionToMainInvitation() {
-    // Pausa e reseta o vídeo
-    DOM.introVideo.pause();
-    DOM.introVideo.onended = null;
-    
-    // Aplica o Blob URL na imagem do convite principal
-    const invitationImg = document.querySelector(".invitation-img");
-    invitationImg.src = blobUrls["card"];
-    
-    // Transiciona as telas
-    DOM.videoScreen.classList.remove("active");
-    DOM.invitationScreen.classList.add("active");
-    
-    // Cria as partículas de luz decorativas na tela do convite
-    createParticles();
-    
-    // Transição suave de volume da música de fundo (50% para 100%)
-    if (!isMuted) {
-        fadeAudioVolume(DOM.bgMusic, 1.0, 1500);
+    // 1. Inicia o fade-in do overlay branco
+    if (DOM.transitionOverlay) {
+        DOM.transitionOverlay.classList.add("active");
     }
+    
+    // 2. Aguarda a transição de fade-in branca terminar (500ms)
+    setTimeout(() => {
+        // Pausa e reseta o vídeo
+        DOM.introVideo.pause();
+        DOM.introVideo.onended = null;
+        
+        // Aplica o Blob URL na imagem do convite principal
+        const invitationImg = document.querySelector(".invitation-img");
+        invitationImg.src = blobUrls["card"];
+        
+        // Transiciona as telas por baixo do painel branco
+        DOM.videoScreen.classList.remove("active");
+        DOM.invitationScreen.classList.add("active");
+        
+        // Cria as partículas de luz decorativas
+        createParticles();
+        
+        // Transição suave de volume da música de fundo (50% para 100%)
+        if (!isMuted) {
+            fadeAudioVolume(DOM.bgMusic, 1.0, 1500);
+        }
+        
+        // 3. Após renderizar as telas, inicia o fade-out do branco
+        setTimeout(() => {
+            if (DOM.transitionOverlay) {
+                DOM.transitionOverlay.classList.remove("active");
+            }
+        }, 100);
+    }, 500);
 }
 
 // Função para fazer transição suave (fade) de volume no elemento de áudio

@@ -365,16 +365,16 @@ html, body {
     height: 22px;
 }
 
-/* Container com Rolagem Interna do Convite */
+/* Container com Rolagem Interna do Convite (Desativada para Tela Cheia) */
 .invitation-scroll-container {
     width: 100%;
     height: 100%;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden; /* Sem rolagem, pois o convite é em tela cheia */
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    padding: 30px 20px;
+    padding: 0; /* Sem bordas/paddings */
+    margin: 0;
     z-index: 5;
 }
 
@@ -382,18 +382,20 @@ html, body {
 .invitation-container {
     position: relative;
     width: 100%;
-    max-width: 440px; /* Largura perfeita para simular proporção de tela do celular */
-    margin: auto 0;
-    display: inline-block;
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(74, 59, 50, 0.15);
-    background-color: var(--color-white);
+    height: 100%;
+    height: 100dvh; /* Altura inteira */
+    max-width: none;
+    margin: 0;
+    border-radius: 0; /* Sem bordas arredondadas */
+    box-shadow: none; /* Sem sombras externas */
+    background-color: transparent;
     overflow: hidden;
 }
 
 .invitation-img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover; /* Imagem cobrindo a tela inteira sem faixas */
     display: block;
     pointer-events: none;
 }
@@ -409,9 +411,9 @@ html, body {
 
 .overlay-btn {
     position: absolute;
-    top: 58.6%; /* Alinhamento vertical centralizado nos ícones circulares da imagem */
-    width: 12.8%; /* Diâmetro proporcional aos círculos da imagem */
-    aspect-ratio: 1 / 1;
+    top: 58.6dvh; /* Posição vertical absoluta e estável proporcional à altura da tela */
+    width: 7.2vh;  /* Diâmetro proporcional baseado na escala de altura (vh) da imagem */
+    height: 7.2vh;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.0);
     border: none;
@@ -437,24 +439,24 @@ html, body {
 .overlay-btn:active .btn-ripple {
     background: rgba(197, 160, 89, 0.15);
     box-shadow: 0 0 0 12px rgba(197, 160, 89, 0);
-    transition: none; /* feedback instantâneo */
+    transition: none;
 }
 
-/* Posicionamento dos botões (Coordenadas baseadas no layout horizontal) */
+/* Posicionamento dos botões (Geometria baseada no centro horizontal da imagem) */
 .btn-confirmar {
-    left: 28.5%;
+    left: calc(50% - 12.1vh);
 }
 
 .btn-dresscode {
-    left: 43.1%;
+    left: calc(50% - 3.9vh);
 }
 
 .btn-localizacao {
-    left: 57.6%;
+    left: calc(50% + 4.3vh);
 }
 
 .btn-presentes {
-    left: 72.0%;
+    left: calc(50% + 12.4vh);
 }
 
 /* Animação Guia de Brilho nos botões */
@@ -494,21 +496,22 @@ html, body {
     }
 }
 
-/* Rodapé do Convite */
-.invitation-footer {
+/* Overlay de Transição em Branco Suave */
+.white-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    text-align: center;
-    margin-top: 20px;
-    font-size: 0.85rem;
-    font-weight: 400;
-    color: var(--color-text-muted);
-    letter-spacing: 0.5px;
-    animation: textPulse 2.5s infinite ease-in-out;
+    height: 100%;
+    background-color: #ffffff;
+    z-index: 99; /* Fica acima das telas de vídeo e convite, mas abaixo dos modais */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
 }
 
-@keyframes textPulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
+.white-transition.active {
+    opacity: 1;
 }
 
 /* ==========================================================================
