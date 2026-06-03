@@ -77,6 +77,11 @@ function initDOMReferences() {
     DOM.particlesContainer = document.getElementById("particles-js");
     DOM.transitionOverlay = document.getElementById("white-transition-overlay");
     
+    // Referências do Pop-up de Enquete (Palpites)
+    DOM.pollOverlay = document.getElementById("poll-overlay");
+    DOM.pollVoteContainer = document.getElementById("poll-vote-container");
+    DOM.pollResultContainer = document.getElementById("poll-result-container");
+    
     // Referências do Modal de RSVP (Confirmação de Presença)
     DOM.modalConfirm = document.getElementById("modal-confirm");
     DOM.btnOpenConfirm = document.getElementById("btn-open-confirm");
@@ -361,6 +366,11 @@ function transitionToMainInvitation() {
         DOM.videoScreen.classList.remove("active");
         DOM.invitationScreen.classList.add("active");
         
+        // Exibe o pop-up da enquete (palpites)
+        if (DOM.pollOverlay) {
+            DOM.pollOverlay.classList.add("active");
+        }
+        
         // Cria as partículas de luz decorativas
         createParticles();
         
@@ -520,6 +530,21 @@ function setupEventListeners() {
                 DOM.rsvpForm.reset();
                 if (DOM.companionsContainer) DOM.companionsContainer.innerHTML = "";
             }, 400);
+        });
+    }
+
+    // --- Ouvintes da Enquete (Palpites) ---
+    const btnPollBoy = document.querySelector(".btn-poll-opt.boy");
+    const btnPollGirl = document.querySelector(".btn-poll-opt.girl");
+    
+    if (btnPollBoy) {
+        btnPollBoy.addEventListener("click", () => {
+            registerPollVote("boy");
+        });
+    }
+    if (btnPollGirl) {
+        btnPollGirl.addEventListener("click", () => {
+            registerPollVote("girl");
         });
     }
 
@@ -752,5 +777,57 @@ function createParticles() {
         
         // Adiciona ao container
         DOM.particlesContainer.appendChild(particle);
+    }
+}
+
+/* ==========================================================================
+   LÓGICA DE REGISTRO E GRAVAÇÃO DE PALPITES (ENQUETE)
+   ========================================================================== */
+function registerPollVote(gender) {
+    console.log("Voto registrado:", gender);
+    
+    // 1. Grava o voto no Firebase Firestore ou LocalStorage
+    if (isFirebaseMode && db) {
+        db.collection("palpites").add({
+            voto: gender,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            console.log("Palpite registrado com sucesso no Firestore.");
+        })
+        .catch(err => {
+            console.error("Falha ao salvar palpite no Firestore, salvando localmente como backup:", err);
+            savePollToLocalStorage(gender);
+        });
+    } else {
+        savePollToLocalStorage(gender);
+    }
+    
+    // 2. Transiciona a visualização da enquete para o feedback
+    if (DOM.pollVoteContainer && DOM.pollResultContainer) {
+        DOM.pollVoteContainer.style.display = "none";
+        DOM.pollResultContainer.style.display = "block";
+    }
+    
+    // 3. Após 2 segundos, fecha a enquete com fade-out suave revelando o convite
+    setTimeout(() => {
+        if (DOM.pollOverlay) {
+            DOM.pollOverlay.classList.remove("active");
+        }
+    }, 2000);
+}
+
+function savePollToLocalStorage(gender) {
+    try {
+        let stored = localStorage.getItem("palpites");
+        let list = [];
+        if (stored) {
+            list = JSON.parse(stored);
+        }
+        list.push({ voto: gender, timestamp: new Date().toISOString() });
+        localStorage.setItem("palpites", JSON.stringify(list));
+        console.log("Palpite salvo localmente no LocalStorage.");
+    } catch (e) {
+        console.error("Erro ao salvar palpite no LocalStorage:", e);
     }
 }

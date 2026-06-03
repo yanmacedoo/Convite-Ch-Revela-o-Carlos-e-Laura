@@ -532,6 +532,146 @@ html, body {
 }
 
 /* ==========================================================================
+   ENQUETE (POLL OVERLAY)
+   ========================================================================== */
+.poll-overlay-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(74, 59, 50, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 95; /* Fica acima do convite principal e partículas, mas abaixo do volume e modais */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.poll-overlay-wrapper.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.poll-container {
+    width: 100%;
+    max-width: 400px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    box-shadow: 0 20px 50px rgba(74, 59, 50, 0.15);
+    border-radius: 28px;
+    padding: 35px 25px;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform var(--transition-normal);
+}
+
+.poll-overlay-wrapper.active .poll-container {
+    transform: scale(1);
+}
+
+.poll-header h2 {
+    font-family: var(--font-accent);
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+    margin-bottom: 8px;
+}
+
+.poll-header p {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-bottom: 30px;
+}
+
+.poll-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.btn-poll-opt {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.45);
+    font-family: var(--font-accent);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    box-shadow: 0 4px 12px rgba(74, 59, 50, 0.04);
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.btn-poll-opt:active {
+    transform: scale(0.98);
+}
+
+/* Opção Menino (Carlos André Neto) */
+.btn-poll-opt.boy {
+    border-left: 6px solid var(--color-blue-dark);
+}
+.btn-poll-opt.boy:active {
+    background-color: rgba(181, 214, 230, 0.35);
+    box-shadow: 0 4px 15px rgba(111, 160, 188, 0.2);
+}
+
+/* Opção Menina (Laura) */
+.btn-poll-opt.girl {
+    border-left: 6px solid var(--color-pink-dark);
+}
+.btn-poll-opt.girl:active {
+    background-color: rgba(245, 203, 210, 0.35);
+    box-shadow: 0 4px 15px rgba(210, 140, 152, 0.2);
+}
+
+.poll-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.poll-name {
+    text-align: left;
+}
+
+/* Resultado / Sucesso */
+#poll-result-container {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.poll-success-icon {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    animation: heartbeat 1.2s infinite ease-in-out;
+}
+
+#poll-result-container h2 {
+    font-family: var(--font-accent);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-gold-dark);
+    margin-bottom: 8px;
+}
+
+.poll-success-msg {
+    font-size: 0.95rem;
+    color: var(--color-text-main);
+}
+
+/* ==========================================================================
    5. ESTILIZAÇÃO DOS MODAIS (OVERLAY & GLASSMORPHISM CONTAINER)
    ========================================================================== */
 .modal-overlay {
@@ -969,7 +1109,8 @@ html, body {
     /* Modais simulados e centralizados em largura de celular */
     #modal-confirm, 
     #modal-dresscode, 
-    #modal-gifts {
+    #modal-gifts,
+    #poll-overlay {
         max-width: 480px;
         left: 50%;
         transform: translateX(-50%);

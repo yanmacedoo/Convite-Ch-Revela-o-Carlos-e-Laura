@@ -74,6 +74,35 @@
         <!-- Partículas de Luz Flutuando em segundo plano para estética premium -->
         <div class="particles-container" id="particles-js"></div>
 
+        <!-- Pop-up Enquete (Palpite dos Pais) -->
+        <div id="poll-overlay" class="poll-overlay-wrapper">
+            <div class="poll-container">
+                <!-- Tela de Escolha -->
+                <div id="poll-vote-container">
+                    <div class="poll-header">
+                        <h2>Faça seu palpite ✨</h2>
+                        <p>Quem você acha que está chegando?</p>
+                    </div>
+                    <div class="poll-options">
+                        <button class="btn-poll-opt boy">
+                            <span class="poll-icon">🩵</span>
+                            <span class="poll-name">Carlos André Neto</span>
+                        </button>
+                        <button class="btn-poll-opt girl">
+                            <span class="poll-icon">🩷</span>
+                            <span class="poll-name">Laura</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Tela de Confirmação -->
+                <div id="poll-result-container" style="display: none;">
+                    <div class="poll-success-icon">💕</div>
+                    <h2>Seu palpite foi registrado!</h2>
+                    <p class="poll-success-msg">Obrigado por votar! Vamos descobrir em breve...</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Botão de Controle de Som -->
         <button id="btn-volume-control" class="btn-volume" aria-label="Mutar/Desmutar música">
             <svg id="volume-icon-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-volume">
@@ -90,9 +119,9 @@
                 <!-- Overlay de Áreas Clicáveis -->
                 <div class="buttons-overlay">
                     <!-- Botão 1: Confirmar Presença (Ursinho) -->
-                    <button id="btn-open-confirm" class="overlay-btn btn-confirmar" aria-label="Confirmar Presença">
+                    <a href="#" id="btn-whatsapp-confirm" class="overlay-btn btn-confirmar" aria-label="Confirmar Presença no WhatsApp">
                         <span class="btn-ripple"></span>
-                    </button>
+                    </a>
                     
                     <!-- Botão 2: Dress Code (Vestidinho) -->
                     <button id="btn-open-dresscode" class="overlay-btn btn-dresscode" aria-label="Visualizar Dress Code">
@@ -108,6 +137,20 @@
                     <button id="btn-open-gifts" class="overlay-btn btn-presentes" aria-label="Ver Sugestões de Presente">
                         <span class="btn-ripple"></span>
                     </button>
+                </div>
+
+                <!-- Contador Regressivo Interativo -->
+                <div id="countdown-widget" class="countdown-container" aria-label="Contador Regressivo para o Evento">
+                    <div class="countdown-items">
+                        <div class="countdown-item"><span id="cd-days">00</span><label>dias</label></div>
+                        <div class="countdown-separator">:</div>
+                        <div class="countdown-item"><span id="cd-hours">00</span><label>horas</label></div>
+                        <div class="countdown-separator">:</div>
+                        <div class="countdown-item"><span id="cd-mins">00</span><label>min</label></div>
+                        <div class="countdown-separator">:</div>
+                        <div class="countdown-item"><span id="cd-secs">00</span><label>seg</label></div>
+                    </div>
+                    <div class="countdown-action-tip">Tocar para salvar data</div>
                 </div>
             </div>
         </div>
@@ -245,6 +288,35 @@
                         <div class="size-badge">XG</div>
                     </div>
                     <p class="brands-text"><strong>Marcas Sugeridas:</strong><br>Pampers, Huggies ou MamyPoko</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Salvar Data na Agenda -->
+    <div id="modal-calendar" class="modal-overlay">
+        <div class="modal-container">
+            <button class="btn-close-modal" aria-label="Fechar Modal">✕</button>
+            <div class="modal-header">
+                <div class="modal-icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="modal-icon">
+                        <path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9H3.75v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <h2>Salvar Data</h2>
+                <h3>Adicione ao seu Calendário</h3>
+            </div>
+            <div class="modal-body">
+                <p class="calendar-intro">Escolha como deseja salvar a data do nosso chá no seu celular:</p>
+                <div class="calendar-options">
+                    <a href="#" id="btn-google-calendar" target="_blank" class="btn-calendar-opt google">
+                        <span class="btn-calendar-icon">📅</span>
+                        <span>Google Agenda</span>
+                    </a>
+                    <button id="btn-ics-calendar" class="btn-calendar-opt apple">
+                        <span class="btn-calendar-icon">⏰</span>
+                        <span>Apple / Outras Agendas (.ics)</span>
+                    </button>
                 </div>
             </div>
         </div>
