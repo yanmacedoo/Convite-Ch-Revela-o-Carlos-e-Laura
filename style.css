@@ -381,21 +381,31 @@ html, body {
 /* Wrapper da Imagem do Convite */
 .invitation-container {
     position: relative;
-    width: 100%;
-    height: 100%;
-    height: 100dvh; /* Altura inteira */
+    aspect-ratio: 9 / 16;
+    height: 100dvh;
+    width: auto;
     max-width: none;
-    margin: 0;
+    margin: 0 auto;
     border-radius: 0; /* Sem bordas arredondadas */
     box-shadow: none; /* Sem sombras externas */
     background-color: transparent;
     overflow: hidden;
+    flex-shrink: 0; /* Impede que o flexbox esprema o container */
+}
+
+/* Garante o comportamento "cover" em telas mais largas que a proporção 9:16 (como tablets e computadores) */
+@media (min-aspect-ratio: 9/16) {
+    .invitation-container {
+        width: 100vw;
+        height: auto;
+        aspect-ratio: 9 / 16;
+    }
 }
 
 .invitation-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Imagem cobrindo a tela inteira sem faixas */
+    object-fit: fill; /* Preenche o container 9:16 perfeito */
     display: block;
     pointer-events: none;
 }
@@ -411,9 +421,9 @@ html, body {
 
 .overlay-btn {
     position: absolute;
-    top: 60.0dvh; /* Posição vertical absoluta e estável proporcional à altura da tela */
-    width: 8.33vh;  /* Diâmetro proporcional baseado na escala de altura (vh) da imagem */
-    height: 8.33vh;
+    top: 60%; /* Posição vertical estável baseada na imagem real */
+    width: 14.81%;  /* Diâmetro horizontal proporcional (8.33% da altura em 9:16) */
+    height: 8.33%; /* Diâmetro vertical proporcional */
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.0);
     border: none;
@@ -444,19 +454,19 @@ html, body {
 
 /* Posicionamento dos botões (Geometria baseada no centro horizontal da imagem) */
 .btn-confirmar {
-    left: calc(50% - 12.34vh);
+    left: 28.06%;
 }
 
 .btn-dresscode {
-    left: calc(50% - 4.12vh);
+    left: 42.68%;
 }
 
 .btn-localizacao {
-    left: calc(50% + 4.12vh);
+    left: 57.32%;
 }
 
 .btn-presentes {
-    left: calc(50% + 12.34vh);
+    left: 71.94%;
 }
 
 
