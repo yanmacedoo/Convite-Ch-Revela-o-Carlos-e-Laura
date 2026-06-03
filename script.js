@@ -16,7 +16,7 @@ const CONFIG = {
     
     // Mídias do projeto e seus respectivos tamanhos exatos em bytes (para cálculo de carregamento preciso)
     mediaFiles: [
-        { id: "envelope", url: "assets/envelope.png", type: "image", size: 998510 },
+        { id: "envelope", url: "assets/envelope.png", type: "image", size: 2458013 },
         { id: "card", url: "assets/card_convite.png", type: "image", size: 2154409 },
         { id: "music", url: "assets/musica_fundo.m4a", type: "audio", size: 2730012 },
         { id: "video", url: "assets/video_abertura.mp4", type: "video", size: 14249012 }
