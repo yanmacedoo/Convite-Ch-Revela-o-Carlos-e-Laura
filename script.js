@@ -8,7 +8,8 @@ const CONFIG = {
     // Mensagem padrão de confirmação no WhatsApp
     whatsappMessage: "Olá! Gostaria de confirmar minha presença no Chá Revelação do Carlos André e Laura! 💖💙",
     
-
+    // Link do Google Maps para o local do evento
+    locationMapsUrl: "https://maps.app.goo.gl/Rcbza42rC4rfhH899",
     
     // Chave PIX dos pais para presentes virtuais/fraldas
     pixKey: "charevelacao@email.com", // SUBSTITUA pela chave correta
