@@ -14,6 +14,9 @@ const CONFIG = {
     // Chave PIX dos pais para presentes virtuais/fraldas
     pixKey: "charevelacao@email.com", // SUBSTITUA pela chave correta
     
+    // Data do evento no formato ISO com fuso horário local (UTC-3)
+    eventDate: "2026-07-04T13:00:00-03:00",
+    
     // Mídias do projeto e seus respectivos tamanhos exatos em bytes (para cálculo de carregamento preciso)
     mediaFiles: [
         { id: "envelope", url: "assets/envelope.png", type: "image", size: 2458013 },
@@ -91,6 +94,16 @@ function initDOMReferences() {
     DOM.rsvpFormContainer = document.getElementById("rsvp-form-container");
     DOM.rsvpSuccessContainer = document.getElementById("rsvp-success-container");
     DOM.btnCloseSuccess = document.getElementById("btn-close-success");
+    
+    // Referências do Contador Regressivo e Modal de Agenda
+    DOM.countdownWidget = document.getElementById("countdown-widget");
+    DOM.cdDays = document.getElementById("cd-days");
+    DOM.cdHours = document.getElementById("cd-hours");
+    DOM.cdMins = document.getElementById("cd-mins");
+    DOM.cdSecs = document.getElementById("cd-secs");
+    DOM.modalCalendar = document.getElementById("modal-calendar");
+    DOM.btnGoogleCalendar = document.getElementById("btn-google-calendar");
+    DOM.btnIcsCalendar = document.getElementById("btn-ics-calendar");
 }
 
 /* ==========================================================================
@@ -124,6 +137,9 @@ function init() {
     
     // 4. Configurar ouvintes de eventos
     setupEventListeners();
+    
+    // Iniciar o contador regressivo
+    startCountdown();
     
     // 5. Iniciar pré-carregamento das mídias
     preloadMedia();
@@ -420,9 +436,8 @@ function fadeAudioVolume(audio, targetVolume, duration = 1500) {
    INTERATIVIDADE E GERENCIAMENTO DE DADOS
    ========================================================================== */
 
-// Inicializa o Firebase Firestore ou define o modo de compatibilidade LocalStorage
 function initDatabase() {
-    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "SUA_API_KEY") {
+    if (typeof firebaseConfig !== 'undefined' && firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "SUA_API_KEY" && typeof firebase !== 'undefined') {
         try {
             // Inicializa o Firebase
             if (!firebase.apps.length) {
@@ -437,7 +452,7 @@ function initDatabase() {
         }
     } else {
         isFirebaseMode = false;
-        console.log("Credenciais do Firebase não configuradas. Rodando no modo LocalStorage.");
+        console.log("Credenciais do Firebase não configuradas ou SDK offline. Rodando no modo LocalStorage.");
     }
 }
 
@@ -567,6 +582,26 @@ function setupEventListeners() {
             e.preventDefault();
         }
     }, { passive: false });
+
+    // Abertura do modal de salvar data pelo widget do contador
+    if (DOM.countdownWidget) {
+        DOM.countdownWidget.addEventListener("click", () => {
+            openModal(DOM.modalCalendar);
+        });
+    }
+    
+    // Ações de calendário
+    if (DOM.btnGoogleCalendar) {
+        DOM.btnGoogleCalendar.addEventListener("click", () => {
+            setupGoogleCalendarLink();
+        });
+    }
+    
+    if (DOM.btnIcsCalendar) {
+        DOM.btnIcsCalendar.addEventListener("click", () => {
+            downloadIcsFile();
+        });
+    }
 }
 
 // Cria um campo de texto dinâmico para acompanhante com botão de remoção
@@ -831,3 +866,88 @@ function savePollToLocalStorage(gender) {
         console.error("Erro ao salvar palpite no LocalStorage:", e);
     }
 }
+
+/* ==========================================================================
+   LÓGICA DO CONTADOR REGRESSIVO E AGENDA
+   ========================================================================== */
+let countdownInterval = null;
+
+function startCountdown() {
+    const targetDate = new Date(CONFIG.eventDate).getTime();
+    
+    function updateClock() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+        
+        if (distance < 0) {
+            clearInterval(countdownInterval);
+            if (DOM.cdDays) DOM.cdDays.textContent = "00";
+            if (DOM.cdHours) DOM.cdHours.textContent = "00";
+            if (DOM.cdMins) DOM.cdMins.textContent = "00";
+            if (DOM.cdSecs) DOM.cdSecs.textContent = "00";
+            return;
+        }
+        
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        if (DOM.cdDays) DOM.cdDays.textContent = String(days).padStart(2, '0');
+        if (DOM.cdHours) DOM.cdHours.textContent = String(hours).padStart(2, '0');
+        if (DOM.cdMins) DOM.cdMins.textContent = String(minutes).padStart(2, '0');
+        if (DOM.cdSecs) DOM.cdSecs.textContent = String(seconds).padStart(2, '0');
+    }
+    
+    updateClock();
+    countdownInterval = setInterval(updateClock, 1000);
+}
+
+function setupGoogleCalendarLink() {
+    if (!DOM.btnGoogleCalendar) return;
+    
+    const title = encodeURIComponent("Chá Revelação - Carlos André Neto ou Laura");
+    // Formato UTC: 04/07/2026 das 13:00 às 18:00 (fuso UTC-3)
+    // 13h UTC-3 = 16h UTC. 18h UTC-3 = 21h UTC.
+    const dates = "20260704T160000Z/20260704T210000Z";
+    const details = encodeURIComponent("Venha descobrir conosco quem sou! Chá Revelação de Carlos André Neto e Laura.");
+    const location = encodeURIComponent("Praia de Pratigi");
+    
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
+    DOM.btnGoogleCalendar.href = url;
+}
+
+function downloadIcsFile() {
+    const icsLines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Nuscorre//Convite Digital//PT",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "BEGIN:VEVENT",
+        "UID:charevelacao20260704@carloselaura",
+        "SUMMARY:Chá Revelação - Carlos André Neto ou Laura",
+        "DESCRIPTION:Venha descobrir conosco quem sou! Chá Revelação de Carlos André Neto e Laura.",
+        "LOCATION:Praia de Pratigi",
+        "DTSTART:20260704T160000Z", // 13:00 Horário Local (UTC-3)
+        "DTEND:20260704T210000Z",   // 18:00 Horário Local (UTC-3)
+        "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z",
+        "END:VEVENT",
+        "END:VCALENDAR"
+    ];
+    
+    const icsString = icsLines.join("\r\n");
+    const blob = new Blob([icsString], { type: "text/calendar;charset=utf-8" });
+    
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "cha-revelacao-carlos-e-laura.ics";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setTimeout(() => {
+        closeModal(DOM.modalCalendar);
+    }, 500);
+}
+

@@ -1305,4 +1305,155 @@ html, body {
     height: 36px;
 }
 
+/* ==========================================================================
+   WIDGET DO CONTADOR REGRESSIVO
+   ========================================================================== */
+.countdown-container {
+    position: absolute;
+    top: 70.5%; /* Posicionado entre o texto Clique nos Botões e os ursinhos */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%; /* Ocupa 80% da largura do container do convite */
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(197, 160, 89, 0.25);
+    box-shadow: 0 8px 24px rgba(74, 59, 50, 0.08);
+    border-radius: 18px;
+    padding: 1.2vh 1vh 0.8vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.countdown-container:active {
+    transform: translate(-50%, -50%) scale(0.96);
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 12px rgba(74, 59, 50, 0.05);
+}
+
+.countdown-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8vh;
+    width: 100%;
+}
+
+.countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 5vh;
+}
+
+.countdown-item span {
+    font-family: var(--font-accent);
+    font-size: 2.4vh;
+    font-weight: 700;
+    color: var(--color-text-main);
+    line-height: 1.1;
+}
+
+.countdown-item label {
+    font-size: 0.85vh;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-gold-dark);
+    margin-top: 0.2vh;
+    font-weight: 500;
+}
+
+.countdown-separator {
+    font-family: var(--font-accent);
+    font-size: 2vh;
+    font-weight: 600;
+    color: var(--color-gold-dark);
+    align-self: flex-start;
+    margin-top: -0.2vh;
+}
+
+.countdown-action-tip {
+    font-size: 0.9vh;
+    color: var(--color-text-muted);
+    letter-spacing: 0.5px;
+    margin-top: 0.8vh;
+    text-transform: uppercase;
+    font-weight: 400;
+    opacity: 0.85;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.countdown-action-tip::before {
+    content: "📅";
+    font-size: 1.05vh;
+}
+
+/* ==========================================================================
+   ESTILOS ESPECÍFICOS: MODAL DE SALVAR DATA (AGENDA)
+   ========================================================================== */
+.calendar-intro {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+    font-size: 0.95rem;
+    color: var(--color-text-main);
+}
+
+.calendar-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.btn-calendar-opt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(197, 160, 89, 0.2);
+    font-family: var(--font-accent);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+    outline: none;
+}
+
+.btn-calendar-opt.google {
+    background-color: rgba(255, 255, 255, 0.75);
+    color: #4285F4;
+    border: 1px solid rgba(66, 133, 244, 0.25);
+}
+
+.btn-calendar-opt.google:active {
+    background-color: rgba(66, 133, 244, 0.08);
+    transform: scale(0.98);
+}
+
+.btn-calendar-opt.apple {
+    background-color: var(--color-text-main);
+    color: var(--color-white);
+    border: none;
+}
+
+.btn-calendar-opt.apple:active {
+    background-color: #3b2f27;
+    transform: scale(0.98);
+}
+
+.btn-calendar-icon {
+    font-size: 1.25rem;
+}
+
 
