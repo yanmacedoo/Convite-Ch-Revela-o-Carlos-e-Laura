@@ -19,7 +19,7 @@ const CONFIG = {
         { id: "envelope", url: "assets/envelope.png", type: "image", size: 2458013 },
         { id: "card", url: "assets/card_convite.png", type: "image", size: 2154409 },
         { id: "music", url: "assets/musica_fundo.m4a", type: "audio", size: 2730012 },
-        { id: "video", url: "assets/video_abertura.mp4", type: "video", size: 14249012 }
+        { id: "video", url: "assets/video_abertura.mp4", type: "video", size: 14182136 }
     ]
 };
 
@@ -231,8 +231,13 @@ function startInvitationFlow() {
     
     // Tenta reproduzir a música e o vídeo simultaneamente
     // Nota: Como o usuário acabou de interagir (clique no envelope), o play() é permitido.
-    DOM.bgMusic.play().catch(e => console.log("Áudio bloqueado ou falhou:", e));
-    DOM.introVideo.play().catch(e => console.log("Vídeo bloqueado ou falhou:", e));
+    DOM.bgMusic.play()
+        .then(() => console.log("Música de fundo inicializada."))
+        .catch(e => console.log("Áudio de fundo bloqueado ou falhou:", e));
+        
+    DOM.introVideo.play()
+        .then(() => console.log("Vídeo de abertura iniciado."))
+        .catch(e => console.log("Vídeo bloqueado ou falhou:", e));
     
     // Transiciona as telas
     DOM.envelopeScreen.classList.remove("active");
@@ -268,10 +273,21 @@ function transitionToMainInvitation() {
         // Cria as partículas de luz decorativas
         createParticles();
         
-        // Transição suave de volume da música de fundo (50% para 100%)
-        if (!isMuted) {
-            fadeAudioVolume(DOM.bgMusic, 1.0, 1500);
-        }
+        // Garante que a música de fundo comece a tocar/continue a tocar
+        // Se ela foi silenciada ou pausada no iOS pelo tocador de vídeo em tela cheia,
+        // o play() aqui vai funcionar porque o elemento foi desbloqueado pelo clique no envelope!
+        DOM.bgMusic.play()
+            .then(() => {
+                console.log("Música tocando com sucesso no convite.");
+                if (!isMuted) {
+                    fadeAudioVolume(DOM.bgMusic, 1.0, 1500);
+                }
+            })
+            .catch(e => {
+                console.log("Erro ao forçar play da música no convite:", e);
+                // Fallback de volume caso ocorra algum bloqueio residual
+                DOM.bgMusic.volume = isMuted ? 0 : 1.0;
+            });
         
         // 3. Após renderizar as telas, inicia o fade-out do branco
         setTimeout(() => {
