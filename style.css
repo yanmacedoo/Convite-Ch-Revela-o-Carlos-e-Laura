@@ -313,21 +313,19 @@ html, body {
     pointer-events: none;
     background-color: #f7e0b5; /* Cor dourada clara premium */
     opacity: 0;
-    animation: floatAndFlicker 20s infinite linear;
+    animation: floatAndFlicker 22s infinite linear;
 }
 
-/* Tipo Poeira: bolinha desfocada e discreta */
+/* Tipo Poeira: bolinha desfocada e discreta (sem filter: blur para compatibilidade máxima) */
 .particle-dust {
     border-radius: 50%;
-    background-color: rgba(247, 224, 181, 0.25);
-    filter: blur(0.5px);
+    background-color: rgba(247, 224, 181, 0.3);
 }
 
-/* Tipo Brilho (Sparkle): Estrela cintilante de 4 pontas usando clip-path */
+/* Tipo Brilho (Sparkle): Estrela cintilante de 4 pontas (sem filter para não sumir no Safari) */
 .particle-sparkle {
     background-color: #ffd899;
     clip-path: polygon(50% 0%, 55% 45%, 100% 50%, 55% 55%, 50% 100%, 45% 55%, 0% 50%, 45% 45%);
-    filter: drop-shadow(0 0 2px rgba(255, 216, 153, 0.6));
 }
 
 /* Tipo Estrela Suave (Star): bolinha pequena brilhante */
@@ -337,42 +335,42 @@ html, body {
     box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.7);
 }
 
-/* Animação de flutuação lenta com pulso de cintilação (opacidade/escala) e balanço lateral */
+/* Animação de flutuação lenta com pulso de cintilação (opacidade/escala) e balanço lateral usando a unidade vh (mais estável que dvh) */
 @keyframes floatAndFlicker {
     0% {
-        transform: translateY(105dvh) translateX(0) scale(0.6) rotate(0deg);
+        transform: translateY(105vh) translateX(0) scale(0.6) rotate(0deg);
         opacity: 0;
     }
     12.5% {
         opacity: 0.25;
-        transform: translateY(90dvh) translateX(8px) scale(0.9) rotate(45deg);
+        transform: translateY(90vh) translateX(8px) scale(0.9) rotate(45deg);
     }
     25% {
         opacity: 0.08; /* Queda de opacidade - Cintilação */
-        transform: translateY(75dvh) translateX(-8px) scale(0.6) rotate(90deg);
+        transform: translateY(75vh) translateX(-8px) scale(0.6) rotate(90deg);
     }
     37.5% {
         opacity: 0.35; /* Pico de opacidade - Cintilação */
-        transform: translateY(60dvh) translateX(15px) scale(1.0) rotate(135deg);
+        transform: translateY(60vh) translateX(15px) scale(1.0) rotate(135deg);
     }
     50% {
         opacity: 0.12; /* Queda de opacidade - Cintilação */
-        transform: translateY(45dvh) translateX(-15px) scale(0.7) rotate(180deg);
+        transform: translateY(45vh) translateX(-15px) scale(0.7) rotate(180deg);
     }
     62.5% {
         opacity: 0.4; /* Pico de opacidade - Cintilação */
-        transform: translateY(30dvh) translateX(10px) scale(1.1) rotate(225deg);
+        transform: translateY(30vh) translateX(10px) scale(1.1) rotate(225deg);
     }
     75% {
         opacity: 0.15; /* Queda de opacidade - Cintilação */
-        transform: translateY(15dvh) translateX(-10px) scale(0.75) rotate(270deg);
+        transform: translateY(15vh) translateX(-10px) scale(0.75) rotate(270deg);
     }
     87.5% {
         opacity: 0.3; /* Pico de opacidade - Cintilação */
-        transform: translateY(0dvh) translateX(5px) scale(0.9) rotate(315deg);
+        transform: translateY(0vh) translateX(5px) scale(0.9) rotate(315deg);
     }
     100% {
-        transform: translateY(-10dvh) translateX(0) scale(0.6) rotate(360deg);
+        transform: translateY(-10vh) translateX(0) scale(0.6) rotate(360deg);
         opacity: 0;
     }
 }

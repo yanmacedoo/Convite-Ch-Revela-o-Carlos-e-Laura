@@ -744,8 +744,8 @@ function createParticles() {
         // Posição horizontal inicial (%)
         particle.style.left = `${Math.random() * 100}%`;
         
-        // Atraso de animação aleatório (dispersão suave no tempo)
-        particle.style.animationDelay = `${Math.random() * 15}s`;
+        // Atraso de animação aleatório (negativo para já iniciar em pontos diferentes da tela)
+        particle.style.animationDelay = `${Math.random() * -28}s`;
         
         // Duração de animação bem lenta (entre 18s e 28s)
         particle.style.animationDuration = `${Math.random() * 10 + 18}s`;
