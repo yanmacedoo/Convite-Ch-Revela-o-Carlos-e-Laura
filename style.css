@@ -463,9 +463,9 @@ html, body {
 
 .overlay-btn {
     position: absolute;
-    top: 60%; /* Posição vertical estável baseada na imagem real */
-    width: 14.81%;  /* Diâmetro horizontal proporcional (8.33% da altura em 9:16) */
-    height: 8.33%; /* Diâmetro vertical proporcional */
+    top: 57.55%; /* Centralizado no centro vertical detectado Y = 1105px (1105/1920) */
+    width: 13.33%;  /* Diâmetro horizontal proporcional de 144px (144/1080) */
+    height: 7.50%; /* Diâmetro vertical proporcional de 144px (144/1920) */
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.0);
     border: none;
@@ -496,19 +496,19 @@ html, body {
 
 /* Posicionamento dos botões (Geometria baseada no centro horizontal da imagem) */
 .btn-confirmar {
-    left: 28.06%;
+    left: 25.56%; /* Centro X = 276px (276/1080) */
 }
 
 .btn-dresscode {
-    left: 42.68%;
+    left: 41.57%; /* Centro X = 449px (449/1080) */
 }
 
 .btn-localizacao {
-    left: 57.32%;
+    left: 57.87%; /* Centro X = 625px (625/1080) */
 }
 
 .btn-presentes {
-    left: 71.94%;
+    left: 74.07%; /* Centro X = 800px (800/1080) */
 }
 
 
@@ -1310,17 +1310,16 @@ html, body {
    ========================================================================== */
 .countdown-container {
     position: absolute;
-    top: 70.3%; /* Posicionado e centralizado perfeitamente na faixa em branco entre o texto e os ursinhos */
+    top: 71.5%; /* Centralizado verticalmente na faixa bege clara entre o texto e os ursinhos */
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 72%; /* Ocupa 72% da largura para ficar com margens laterais elegantes */
-    background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(197, 160, 89, 0.25);
-    box-shadow: 0 8px 24px rgba(74, 59, 50, 0.08);
-    border-radius: 14px;
-    padding: 0.8vh 1.2vh; /* Padding simétrico vertical e horizontalmente */
+    width: auto; /* Largura automática para ficar compacto */
+    background: transparent; /* Remove completamente a caixa de fundo */
+    border: none; /* Remove a borda */
+    box-shadow: none; /* Remove a sombra */
+    backdrop-filter: none; /* Remove o desfoque de fundo */
+    -webkit-backdrop-filter: none;
+    padding: 0; /* Sem paddings adicionais */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1333,7 +1332,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.6vh;
+    gap: 0.4vh; /* Menos espaço de separação horizontal */
     width: 100%;
 }
 
@@ -1341,21 +1340,21 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 4.2vh;
+    min-width: 2.8vh; /* Largura mínima menor para condensar */
 }
 
 .countdown-item span {
     font-family: var(--font-accent);
-    font-size: 1.9vh;
+    font-size: 1.25vh; /* Fonte compacta e delicada */
     font-weight: 700;
     color: var(--color-text-main);
     line-height: 1.1;
 }
 
 .countdown-item label {
-    font-size: 0.7vh;
+    font-size: 0.5vh; /* Rótulo super discreto */
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.2px;
     color: var(--color-gold-dark);
     margin-top: 0.1vh;
     font-weight: 500;
@@ -1363,7 +1362,7 @@ html, body {
 
 .countdown-separator {
     font-family: var(--font-accent);
-    font-size: 1.6vh;
+    font-size: 1.0vh; /* Separador menor */
     font-weight: 600;
     color: var(--color-gold-dark);
     align-self: flex-start;
