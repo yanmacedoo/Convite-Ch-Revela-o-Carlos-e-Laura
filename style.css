@@ -1320,21 +1320,13 @@ html, body {
     border: 1px solid rgba(197, 160, 89, 0.25);
     box-shadow: 0 8px 24px rgba(74, 59, 50, 0.08);
     border-radius: 14px;
-    padding: 0.8vh 0.8vh 0.6vh;
+    padding: 0.8vh 1.2vh; /* Padding simétrico vertical e horizontalmente */
     display: flex;
     flex-direction: column;
     align-items: center;
-    cursor: pointer;
     z-index: 10;
-    transition: transform var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
     user-select: none;
     -webkit-user-select: none;
-}
-
-.countdown-container:active {
-    transform: translate(-50%, -50%) scale(0.96);
-    background: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 4px 12px rgba(74, 59, 50, 0.05);
 }
 
 .countdown-items {
