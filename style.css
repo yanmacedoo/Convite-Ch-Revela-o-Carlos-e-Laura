@@ -969,6 +969,26 @@ html, body {
     margin-bottom: 4px;
 }
 
+.mimo-suggestion {
+    margin-top: 20px;
+    border-top: 1px dashed rgba(74, 59, 50, 0.15);
+    padding-top: 15px;
+}
+
+.mimo-suggestion h4 {
+    font-family: var(--font-accent);
+    color: var(--color-gold-dark);
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+.mimo-suggestion p {
+    font-size: 0.85rem;
+    color: var(--color-text-main);
+    line-height: 1.4;
+}
+
 .divider {
     text-align: center;
     margin: 20px 0;
