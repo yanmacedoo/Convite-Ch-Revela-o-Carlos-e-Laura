@@ -19,7 +19,7 @@ const CONFIG = {
         { id: "envelope", url: "assets/envelope.png", type: "image", size: 2458013 },
         { id: "card", url: "assets/card_convite.png", type: "image", size: 2154409 },
         { id: "music", url: "assets/musica_fundo.m4a", type: "audio", size: 2730012 },
-        { id: "video", url: "assets/video_abertura.mp4", type: "video", size: 14182136 }
+        { id: "video", url: "assets/video_abertura.mp4", type: "video", size: 14358892 }
     ]
 };
 
@@ -302,8 +302,8 @@ function startInvitationFlow() {
     DOM.introVideo.src = CONFIG.mediaFiles.find(f => f.id === "video").url;
     DOM.introVideo.volume = 1.0;
     
-    // 1. Toca a música de fundo usando a Web Audio API a 30% de volume
-    playMusicWebAudio(0.3);
+    // 1. Toca a música de fundo usando a Web Audio API a 20% de volume
+    playMusicWebAudio(0.2);
     
     // 2. Aguarda 150ms para inicializar o vídeo de abertura com áudio.
     // Isso dá tempo ao sistema operacional móvel para mixar os dois canais sem rejeição.
@@ -457,8 +457,8 @@ function toggleMute() {
         iconOn.style.display = "none";
         iconOff.style.display = "block";
     } else {
-        // Aumenta volume ao máximo (1.0 na tela do convite, ou 0.3 no vídeo)
-        const targetVol = DOM.invitationScreen.classList.contains("active") ? 1.0 : 0.3;
+        // Aumenta volume ao máximo (1.0 na tela do convite, ou 0.2 no vídeo)
+        const targetVol = DOM.invitationScreen.classList.contains("active") ? 1.0 : 0.2;
         if (gainNode) {
             fadeMusicVolumeWebAudio(targetVol, 0.5);
         } else {
