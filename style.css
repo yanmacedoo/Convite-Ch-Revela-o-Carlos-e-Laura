@@ -411,9 +411,9 @@ html, body {
 
 .overlay-btn {
     position: absolute;
-    top: 58.6dvh; /* Posição vertical absoluta e estável proporcional à altura da tela */
-    width: 7.2vh;  /* Diâmetro proporcional baseado na escala de altura (vh) da imagem */
-    height: 7.2vh;
+    top: 60.0dvh; /* Posição vertical absoluta e estável proporcional à altura da tela */
+    width: 8.33vh;  /* Diâmetro proporcional baseado na escala de altura (vh) da imagem */
+    height: 8.33vh;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.0);
     border: none;
@@ -444,19 +444,19 @@ html, body {
 
 /* Posicionamento dos botões (Geometria baseada no centro horizontal da imagem) */
 .btn-confirmar {
-    left: calc(50% - 12.1vh);
+    left: calc(50% - 12.34vh);
 }
 
 .btn-dresscode {
-    left: calc(50% - 3.9vh);
+    left: calc(50% - 4.12vh);
 }
 
 .btn-localizacao {
-    left: calc(50% + 4.3vh);
+    left: calc(50% + 4.12vh);
 }
 
 .btn-presentes {
-    left: calc(50% + 12.4vh);
+    left: calc(50% + 12.34vh);
 }
 
 /* Animação Guia de Brilho nos botões */

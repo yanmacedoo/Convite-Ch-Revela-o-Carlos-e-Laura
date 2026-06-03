@@ -33,6 +33,12 @@ const blobUrls = {};
 let isMuted = false;
 let currentVolume = 0.5;
 
+// Variáveis da Web Audio API para tocar música em paralelo no iOS sem conflito com o vídeo
+let audioCtx = null;
+let audioBuffer = null;
+let audioSource = null;
+let gainNode = null;
+
 // Objeto global que conterá as referências do DOM após a inicialização
 const DOM = {};
 
@@ -158,6 +164,24 @@ async function preloadMedia() {
                 if (xhr.status >= 200 && xhr.status < 300 && xhr.response) {
                     const blob = xhr.response;
                     blobUrls[file.id] = URL.createObjectURL(blob);
+                    
+                    // Se for a música de fundo, decodifica também como ArrayBuffer para a Web Audio API
+                    if (file.id === "music") {
+                        const reader = new FileReader();
+                        reader.onload = function() {
+                            const arrayBuffer = reader.result;
+                            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                            if (!audioCtx) audioCtx = new AudioContextClass();
+                            
+                            audioCtx.decodeAudioData(arrayBuffer, function(buffer) {
+                                audioBuffer = buffer;
+                                console.log("Música decodificada com sucesso para a Web Audio API.");
+                            }, function(e) {
+                                console.error("Erro ao decodificar áudio na Web Audio API:", e);
+                            });
+                        };
+                        reader.readAsArrayBuffer(blob);
+                    }
                 } else {
                     console.warn(`Erro HTTP ${xhr.status} ao carregar ${file.url}. Usando fallback.`);
                     blobUrls[file.id] = file.url; // Fallback para URL direta
@@ -218,34 +242,76 @@ function transitionToEnvelope() {
     DOM.envelopeScreen.classList.add("active");
 }
 
+// Função para iniciar a música de fundo usando a Web Audio API (contorna restrições de concorrência do iOS)
+function playMusicWebAudio(initialVolume) {
+    try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx) audioCtx = new AudioContextClass();
+
+        // Resume o contexto se estiver suspenso (exigência dos navegadores)
+        if (audioCtx.state === "suspended") {
+            audioCtx.resume();
+        }
+
+        if (audioBuffer) {
+            // Se já houver um áudio tocando, interrompe
+            if (audioSource) {
+                try { audioSource.stop(); } catch(e) {}
+            }
+
+            audioSource = audioCtx.createBufferSource();
+            audioSource.buffer = audioBuffer;
+            audioSource.loop = true;
+
+            // Cria o controle de ganho (volume)
+            gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(initialVolume, audioCtx.currentTime);
+
+            // Conexões: Fonte -> Volume -> Alto-falantes
+            audioSource.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            audioSource.start(0);
+            console.log("Web Audio API: Trilha iniciada a " + (initialVolume * 100) + "% de volume.");
+        } else {
+            console.warn("Áudio não decodificado a tempo. Usando fallback tradicional.");
+            DOM.bgMusic.src = CONFIG.mediaFiles.find(f => f.id === "music").url;
+            DOM.bgMusic.volume = initialVolume;
+            DOM.bgMusic.play().catch(e => console.log("Fallback de áudio tradicional falhou:", e));
+        }
+    } catch (err) {
+        console.error("Falha ao configurar Web Audio API:", err);
+    }
+}
+
+// Faz o fade de volume linear nativo na Web Audio API
+function fadeMusicVolumeWebAudio(targetVolume, durationSeconds = 1.5) {
+    if (gainNode && audioCtx) {
+        // Cancela agendamentos futuros e estabiliza volume atual
+        gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
+        // Executa a rampa linear de volume
+        gainNode.gain.linearRampToValueAtTime(targetVolume, audioCtx.currentTime + durationSeconds);
+        console.log(`Web Audio API: Fade de volume agendado para ${targetVolume} em ${durationSeconds}s.`);
+    }
+}
+
 // Transição do envelope para o vídeo
 function startInvitationFlow() {
-    // Configura o áudio e vídeo com as URLs diretas de rede para compatibilidade total com o iOS
-    // Como o preloader já baixou os arquivos, o navegador servirá do cache instantaneamente
+    // Configura o vídeo
     DOM.introVideo.src = CONFIG.mediaFiles.find(f => f.id === "video").url;
-    DOM.bgMusic.src = CONFIG.mediaFiles.find(f => f.id === "music").url;
-    
-    // Configura volumes iniciais (Música a 30% de volume, Vídeo a 100%)
-    DOM.bgMusic.volume = 0.3;
     DOM.introVideo.volume = 1.0;
     
-    // Inicia a música de fundo primeiro. Ao dar certo, aguarda 150ms para iniciar o vídeo.
-    // Esse micro-atraso dá tempo para o iOS alocar o canal de áudio e mixar ambas as mídias sem bloqueios.
-    DOM.bgMusic.play()
-        .then(() => {
-            console.log("Música de fundo iniciada com sucesso.");
-            setTimeout(() => {
-                DOM.introVideo.play()
-                    .then(() => console.log("Vídeo de abertura iniciado com sucesso."))
-                    .catch(e => console.log("Vídeo bloqueado pelo navegador:", e));
-            }, 150);
-        })
-        .catch(e => {
-            console.warn("Música falhou ao iniciar no envelope. Iniciando vídeo...", e);
-            // Fallback: se a música falhar, inicia o vídeo imediatamente
-            DOM.introVideo.play()
-                .catch(e => console.log("Vídeo bloqueado pelo navegador:", e));
-        });
+    // 1. Toca a música de fundo usando a Web Audio API a 30% de volume
+    playMusicWebAudio(0.3);
+    
+    // 2. Aguarda 150ms para inicializar o vídeo de abertura com áudio.
+    // Isso dá tempo ao sistema operacional móvel para mixar os dois canais sem rejeição.
+    setTimeout(() => {
+        DOM.introVideo.play()
+            .then(() => console.log("Vídeo de abertura iniciado com sucesso."))
+            .catch(e => console.log("Vídeo bloqueado pelo navegador:", e));
+    }, 150);
     
     // Transiciona as telas
     DOM.envelopeScreen.classList.remove("active");
@@ -281,21 +347,15 @@ function transitionToMainInvitation() {
         // Cria as partículas de luz decorativas
         createParticles();
         
-        // Garante que a música de fundo comece a tocar/continue a tocar
-        // Se ela foi silenciada ou pausada no iOS pelo tocador de vídeo em tela cheia,
-        // o play() aqui vai funcionar porque o elemento foi desbloqueado pelo clique no envelope!
-        DOM.bgMusic.play()
-            .then(() => {
-                console.log("Música tocando com sucesso no convite.");
-                if (!isMuted) {
-                    fadeAudioVolume(DOM.bgMusic, 1.0, 1500);
-                }
-            })
-            .catch(e => {
-                console.log("Erro ao forçar play da música no convite:", e);
-                // Fallback de volume caso ocorra algum bloqueio residual
-                DOM.bgMusic.volume = isMuted ? 0 : 1.0;
-            });
+        // Sobe o volume da música de 30% para 100% de forma suave
+        if (!isMuted) {
+            if (gainNode) {
+                fadeMusicVolumeWebAudio(1.0, 1.5);
+            } else {
+                DOM.bgMusic.play().catch(() => {});
+                fadeAudioVolume(DOM.bgMusic, 1.0, 1500);
+            }
+        }
         
         // 3. Após renderizar as telas, inicia o fade-out do branco
         setTimeout(() => {
@@ -388,14 +448,22 @@ function toggleMute() {
     
     if (isMuted) {
         // Reduz volume a zero suavemente
-        fadeAudioVolume(DOM.bgMusic, 0, 500);
+        if (gainNode) {
+            fadeMusicVolumeWebAudio(0, 0.5);
+        } else {
+            fadeAudioVolume(DOM.bgMusic, 0, 500);
+        }
         // Exibe ícone de mutado
         iconOn.style.display = "none";
         iconOff.style.display = "block";
     } else {
-        // Aumenta volume ao máximo suavemente (1.0 na tela do convite, ou 0.5 nas outras)
-        const targetVol = DOM.invitationScreen.classList.contains("active") ? 1.0 : 0.5;
-        fadeAudioVolume(DOM.bgMusic, targetVol, 500);
+        // Aumenta volume ao máximo (1.0 na tela do convite, ou 0.3 no vídeo)
+        const targetVol = DOM.invitationScreen.classList.contains("active") ? 1.0 : 0.3;
+        if (gainNode) {
+            fadeMusicVolumeWebAudio(targetVol, 0.5);
+        } else {
+            fadeAudioVolume(DOM.bgMusic, targetVol, 500);
+        }
         // Exibe ícone de tocando
         iconOn.style.display = "block";
         iconOff.style.display = "none";
