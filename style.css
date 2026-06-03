@@ -1310,7 +1310,7 @@ html, body {
    ========================================================================== */
 .countdown-container {
     position: absolute;
-    top: 72.3%; /* Centralizado exatamente no meio entre o box marrom e as orelhas dos ursos */
+    top: 71.0%; /* Centralizado exatamente no meio entre o box marrom e as orelhas dos ursos */
     left: 50%;
     transform: translate(-50%, -50%);
     width: auto; /* Largura automática para ficar compacto */
