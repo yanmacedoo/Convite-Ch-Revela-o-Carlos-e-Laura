@@ -861,12 +861,13 @@ html, body {
 }
 
 .color-palette {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
 }
 
 .color-swatch {
+    width: 80px;
     height: 60px;
     border-radius: 12px;
     display: flex;
