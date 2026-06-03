@@ -870,9 +870,8 @@ function savePollToLocalStorage(gender) {
 /* ==========================================================================
    LÓGICA DO CONTADOR REGRESSIVO E AGENDA
    ========================================================================== */
-let countdownInterval = null;
-
 function startCountdown() {
+    let countdownInterval = null;
     const targetDate = new Date(CONFIG.eventDate).getTime();
     
     function updateClock() {
@@ -880,7 +879,7 @@ function startCountdown() {
         const distance = targetDate - now;
         
         if (distance < 0) {
-            clearInterval(countdownInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
             if (DOM.cdDays) DOM.cdDays.textContent = "00";
             if (DOM.cdHours) DOM.cdHours.textContent = "00";
             if (DOM.cdMins) DOM.cdMins.textContent = "00";
