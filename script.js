@@ -65,7 +65,6 @@ function initDOMReferences() {
     DOM.bgMusic = document.getElementById("bg-music");
     DOM.btnVolumeControl = document.getElementById("btn-volume-control");
     
-    DOM.btnConfirmar = document.getElementById("btn-whatsapp-confirm");
     DOM.btnLocalizacao = document.getElementById("btn-maps-location");
     
     DOM.btnOpenDressCode = document.getElementById("btn-open-dresscode");
@@ -124,10 +123,6 @@ function init() {
     // 2. Inicializa o Banco de Dados (Firebase ou LocalStorage)
     initDatabase();
 
-    // 3. Definir links dinâmicos no HTML
-    if (DOM.btnConfirmar) {
-        DOM.btnConfirmar.href = `https://api.whatsapp.com/send?phone=${CONFIG.whatsappNumber}&text=${encodeURIComponent(CONFIG.whatsappMessage)}`;
-    }
     if (DOM.btnLocalizacao) {
         DOM.btnLocalizacao.href = CONFIG.locationMapsUrl;
     }
