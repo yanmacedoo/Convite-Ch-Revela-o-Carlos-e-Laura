@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chá Revelação - Carlos André Neto ou Laura</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. Tela de Carregamento (Loading Screen) -->
+    <div id="loading-screen" class="screen active">
+        <div class="loader-content">
+            <div class="loader-circle-container">
+                <svg class="loader-svg" viewBox="0 0 100 100">
+                    <circle class="loader-bg" cx="50" cy="50" r="45"></circle>
+                    <circle id="loader-progress-bar" cx="50" cy="50" r="45"></circle>
+                </svg>
+                <div id="loader-percentage" class="loader-text">0%</div>
+            </div>
+            <h1 class="loader-title">Preparando o Carinho...</h1>
+            <p class="loader-subtitle">Carregando convite digital</p>
+        </div>
+    </div>
+
+    <!-- 2. Tela do Envelope (Envelope Screen) -->
+    <div id="envelope-screen" class="screen">
+        <div class="envelope-wrapper">
+            <!-- Imagem de fundo do envelope -->
+            <img src="assets/envelope.png" alt="Envelope do Convite" class="envelope-img">
+            
+            <!-- Overlay com o botão de clique -->
+            <div class="envelope-overlay">
+                <button id="btn-open-invitation" class="btn-pulse" aria-label="Abrir Convite">
+                    <span>Clique para Abrir</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-heart">
+                        <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Tela do Vídeo (Fullscreen Video Screen) -->
+    <div id="video-screen" class="screen">
+        <video id="intro-video" playsinline preload="auto">
+            <source src="assets/video_abertura.mp4" type="video/mp4">
+            Seu navegador não suporta a reprodução de vídeo.
+        </video>
+        <!-- Botão Pular Vídeo -->
+        <button id="btn-skip-video" class="btn-skip" aria-label="Pular Vídeo">Pular ✕</button>
+    </div>
+
+    <!-- 4. Página Principal (Invitation Screen) -->
+    <div id="invitation-screen" class="screen">
+        <!-- Partículas de Luz Flutuando em segundo plano para estética premium -->
+        <div class="particles-container" id="particles-js"></div>
+
+        <!-- Botão de Controle de Som -->
+        <button id="btn-volume-control" class="btn-volume" aria-label="Mutar/Desmutar música">
+            <svg id="volume-icon-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-volume">
+                <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.063.922-2.063 2.063v4.875c0 1.141.922 2.062 2.063 2.062h1.932l4.5 4.5c.944.945 2.56.276 2.56-1.06V4.06zM17.78 9.22a.75.75 0 10-1.06 1.06L18.44 12l-1.72 1.72a.75.75 0 001.06 1.06l1.72-1.72 1.72 1.72a.75.75 0 101.06-1.06L20.56 12l1.72-1.72a.75.75 0 00-1.06-1.06l-1.72 1.72-1.72-1.72z" style="display: none;" />
+                <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.063.922-2.063 2.063v4.875c0 1.141.922 2.062 2.063 2.062h1.932l4.5 4.5c.944.945 2.56.276 2.56-1.06V4.06zM18.563 12A5.625 5.625 0 0015 6.938v10.125A5.625 5.625 0 0018.563 12zM22.5 12c0-5.32-3.601-9.799-8.5-11.162v1.549C18.03 3.695 21 7.495 21 12s-2.97 8.305-7 9.613v1.549c4.899-1.363 8.5-5.842 8.5-11.162z" />
+            </svg>
+        </button>
+
+        <div class="invitation-scroll-container">
+            <div class="invitation-container">
+                <!-- Imagem do Convite Principal -->
+                <img src="assets/card_convite.png" alt="Chá Revelação Carlos André Neto ou Laura" class="invitation-img">
+                
+                <!-- Overlay de Áreas Clicáveis -->
+                <div class="buttons-overlay">
+                    <!-- Botão 1: Confirmar Presença (Ursinho) -->
+                    <a href="#" id="btn-whatsapp-confirm" class="overlay-btn btn-confirmar" aria-label="Confirmar Presença no WhatsApp">
+                        <span class="btn-ripple"></span>
+                    </a>
+                    
+                    <!-- Botão 2: Dress Code (Vestidinho) -->
+                    <button id="btn-open-dresscode" class="overlay-btn btn-dresscode" aria-label="Visualizar Dress Code">
+                        <span class="btn-ripple"></span>
+                    </button>
+                    
+                    <!-- Botão 3: Localização (Pin) -->
+                    <a href="#" id="btn-maps-location" class="overlay-btn btn-localizacao" aria-label="Ver Localização no Google Maps">
+                        <span class="btn-ripple"></span>
+                    </a>
+                    
+                    <!-- Botão 4: Sugestão de Presente (Caixinha) -->
+                    <button id="btn-open-gifts" class="overlay-btn btn-presentes" aria-label="Ver Sugestões de Presente">
+                        <span class="btn-ripple"></span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="invitation-footer">
+                <p>Toque nos botões do convite para interagir</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Modais Premium (Glassmorphism & iOS style sheets) -->
+    
+    <!-- Modal: Dress Code -->
+    <div id="modal-dresscode" class="modal-overlay">
+        <div class="modal-container">
+            <button class="btn-close-modal" aria-label="Fechar Modal">✕</button>
+            <div class="modal-header">
+                <div class="modal-icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="modal-icon">
+                        <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <h2>Dress Code</h2>
+                <h3>Sugestão de Traje</h3>
+            </div>
+            <div class="modal-body">
+                <p class="dresscode-intro">Para combinarmos com o clima especial do nosso Chá Revelação, sugerimos um traje <strong>Esporte Fino / Casual Leve</strong>.</p>
+                
+                <div class="dresscode-details">
+                    <div class="dresscode-item">
+                        <strong>Estilo:</strong>
+                        <p>Roupas leves e confortáveis, ideais para o local (Praia de Pratigi).</p>
+                    </div>
+                    
+                    <div class="dresscode-colors">
+                        <strong>Cores Sugeridas:</strong>
+                        <p>Damos preferência a tons suaves e claros (Tons Pastéis):</p>
+                        <div class="color-palette">
+                            <div class="color-swatch beige" data-color="Bege/Nude"><span>Bege</span></div>
+                            <div class="color-swatch blue-pastel" data-color="Azul Bebê"><span>Azul</span></div>
+                            <div class="color-swatch pink-pastel" data-color="Rosa Bebê"><span>Rosa</span></div>
+                            <div class="color-swatch white" data-color="Branco/Off-White"><span>Branco</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dresscode-tip">
+                    <p>💡 <em>Dica: Como o evento será próximo à praia, opte por sapatos confortáveis e tecidos frescos.</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Sugestão de Presente -->
+    <div id="modal-gifts" class="modal-overlay">
+        <div class="modal-container">
+            <button class="btn-close-modal" aria-label="Fechar Modal">✕</button>
+            <div class="modal-header">
+                <div class="modal-icon-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="modal-icon">
+                        <path d="M9.375 3a1.875 1.875 0 000 3.75h1.875v4.5H3.75A1.875 1.875 0 001.875 13v6a1.875 1.875 0 001.875 1.875h16.5A1.875 1.875 0 0022.125 19v-6a1.875 1.875 0 00-1.875-1.875H12.75v-4.5h1.875A1.875 1.875 0 1014.625 3H9.375zM12 9.75h-.75v-3h1.5v3H12z" />
+                    </svg>
+                </div>
+                <h2>Lista de Presentes</h2>
+                <h3>Sugestões para o Bebê</h3>
+            </div>
+            <div class="modal-body">
+                <div class="diaper-suggestions">
+                    <h4>Tamanhos de Fraldas</h4>
+                    <div class="diaper-sizes">
+                        <div class="size-badge">M</div>
+                        <div class="size-badge">G</div>
+                        <div class="size-badge">XG</div>
+                    </div>
+                    <p class="brands-text"><strong>Marcas Sugeridas:</strong><br>Pampers, Huggies ou MamyPoko</p>
+                </div>
+
+                <div class="divider"><span>OU</span></div>
+
+                <div class="pix-gift-area">
+                    <h4>Presente em Dinheiro (PIX)</h4>
+                    <p class="pix-subtitle">Se preferir nos presentear de forma virtual, criamos uma chave PIX dedicada para o enxoval:</p>
+                    
+                    <div class="pix-code-box">
+                        <span id="pix-key-text">charevelacao@email.com</span>
+                        <button id="btn-copy-pix" class="btn-copy">
+                            <span id="copy-text">Copiar Chave</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="icon-copy">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125v-9.75A1.125 1.125 0 015 9.75h3.375m1.5 1.5h9.75a1.125 1.125 0 011.125 1.125v9.75a1.125 1.125 0 01-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V11.25a1.125 1.125 0 011.125-1.125z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="pix-recipient">Favorecido: Carlos André e Laura</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elemento de áudio contínuo oculto -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="assets/musica_fundo.m4a" type="audio/mp4">
+        Seu navegador não suporta a reprodução de áudio.
+    </audio>
+
+    <!-- JS Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>

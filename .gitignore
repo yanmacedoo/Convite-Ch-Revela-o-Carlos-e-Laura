@@ -1,0 +1,9 @@
+# Dependências
+node_modules/
+
+# Produção / Builds
+dist/
+
+# Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db

@@ -1,0 +1,944 @@
+/* ==========================================================================
+   DESIGN SYSTEM & CUSTOM PROPERTIES
+   ========================================================================== */
+:root {
+    /* Paleta de cores premium (Baseada no Chá Revelação) */
+    --color-bg-light: #fdfaf6;
+    --color-bg-cream: #f4eae1;
+    --color-wood-frame: #decbb7;
+    --color-gold: #c5a059;
+    --color-gold-dark: #aa843d;
+    
+    --color-pink-soft: #f5cbd2;
+    --color-pink-dark: #d28c98;
+    
+    --color-blue-soft: #b5d6e6;
+    --color-blue-dark: #6fa0bc;
+    
+    --color-text-main: #4a3b32;
+    --color-text-muted: #8c7b70;
+    --color-white: #ffffff;
+    
+    /* Fontes */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-accent: 'Outfit', sans-serif;
+    
+    /* Efeitos */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-blur: blur(20px) saturate(180%);
+    --glass-shadow: 0 8px 32px 0 rgba(74, 59, 50, 0.08);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+    
+    /* Transições */
+    --transition-slow: 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    --transition-normal: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-fast: 0.2s ease;
+}
+
+/* ==========================================================================
+   RESET & CONFIGURAÇÕES BÁSICAS
+   ========================================================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--color-bg-light);
+    color: var(--color-text-main);
+    font-family: var(--font-primary);
+    font-size: 16px;
+    line-height: 1.5;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+/* Container de Telas (Screens) */
+.screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh; /* Dynamic Viewport Height para mobile */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity var(--transition-slow), transform var(--transition-slow);
+    overflow: hidden;
+}
+
+.screen.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+/* ==========================================================================
+   1. TELA DE CARREGAMENTO (LOADING SCREEN)
+   ========================================================================== */
+#loading-screen {
+    background: radial-gradient(circle at center, #ffffff 0%, var(--color-bg-cream) 100%);
+}
+
+.loader-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loader-circle-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 30px;
+}
+
+.loader-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.loader-svg circle {
+    fill: none;
+    stroke-width: 6;
+}
+
+.loader-svg .loader-bg {
+    stroke: rgba(197, 160, 89, 0.1);
+}
+
+#loader-progress-bar {
+    stroke: var(--color-gold);
+    stroke-linecap: round;
+    stroke-dasharray: 283; /* 2 * PI * r (2 * 3.14159 * 45) */
+    stroke-dashoffset: 283;
+    transition: stroke-dashoffset 0.15s ease-out;
+}
+
+.loader-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-accent);
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.loader-title {
+    font-family: var(--font-accent);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--color-text-main);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.loader-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    font-weight: 300;
+}
+
+/* ==========================================================================
+   2. TELA DO ENVELOPE (ENVELOPE SCREEN)
+   ========================================================================== */
+#envelope-screen {
+    background: radial-gradient(circle at center, #fdfbfa 0%, #f1e4d8 100%);
+}
+
+.envelope-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.envelope-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+.envelope-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+}
+
+/* Botão Pulsante do Envelope */
+.btn-pulse {
+    position: absolute;
+    top: 31%; /* Posicionado acima do lacre do envelope */
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    box-shadow: 0 4px 20px rgba(74, 59, 50, 0.1);
+    color: var(--color-text-main);
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-family: var(--font-accent);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    outline: none;
+    animation: ripple-animation 2s infinite ease-in-out;
+    transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.btn-pulse:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.icon-heart {
+    width: 16px;
+    height: 16px;
+    color: var(--color-pink-dark);
+    animation: heartbeat 1.2s infinite ease-in-out;
+}
+
+@keyframes ripple-animation {
+    0% {
+        box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.3), 0 4px 20px rgba(74, 59, 50, 0.1);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(197, 160, 89, 0), 0 4px 20px rgba(74, 59, 50, 0.1);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(197, 160, 89, 0), 0 4px 20px rgba(74, 59, 50, 0.1);
+    }
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.25); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.25); }
+    70% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   3. TELA DO VÍDEO (VIDEO SCREEN)
+   ========================================================================== */
+#video-screen {
+    background-color: #000;
+}
+
+#intro-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-skip {
+    position: absolute;
+    top: 25px;
+    right: 20px;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--color-white);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-skip:active {
+    transform: scale(0.95);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   4. PÁGINA PRINCIPAL (INVITATION SCREEN)
+   ========================================================================== */
+#invitation-screen {
+    background: radial-gradient(circle at center, #fdfcf9 0%, #f5ebd8 100%);
+    justify-content: flex-start;
+    align-items: center;
+}
+
+/* Partículas de fundo */
+.particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    background-color: rgba(197, 160, 89, 0.25);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: floatUp 12s infinite linear;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(110vh) translateX(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-10vh) translateX(30px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Botão de Controle de Som */
+.btn-volume {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 30;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    color: var(--color-text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    outline: none;
+    transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.btn-volume:active {
+    transform: scale(0.9);
+}
+
+.icon-volume {
+    width: 22px;
+    height: 22px;
+}
+
+/* Container com Rolagem Interna do Convite */
+.invitation-scroll-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    z-index: 5;
+}
+
+/* Wrapper da Imagem do Convite */
+.invitation-container {
+    position: relative;
+    width: 100%;
+    max-width: 440px; /* Largura perfeita para simular proporção de tela do celular */
+    margin: auto 0;
+    display: inline-block;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(74, 59, 50, 0.15);
+    background-color: var(--color-white);
+    overflow: hidden;
+}
+
+.invitation-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    pointer-events: none;
+}
+
+/* Overlay de Áreas Clicáveis */
+.buttons-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.overlay-btn {
+    position: absolute;
+    top: 58.6%; /* Alinhamento vertical centralizado nos ícones circulares da imagem */
+    width: 12.8%; /* Diâmetro proporcional aos círculos da imagem */
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.0);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Efeito Ripple / Feedback ao tocar nos botões */
+.btn-ripple {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0);
+    box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.5);
+    transition: box-shadow 0.4s ease, background-color 0.4s ease;
+}
+
+.overlay-btn:active .btn-ripple {
+    background: rgba(197, 160, 89, 0.15);
+    box-shadow: 0 0 0 12px rgba(197, 160, 89, 0);
+    transition: none; /* feedback instantâneo */
+}
+
+/* Posicionamento dos botões (Coordenadas baseadas no layout horizontal) */
+.btn-confirmar {
+    left: 28.5%;
+}
+
+.btn-dresscode {
+    left: 43.1%;
+}
+
+.btn-localizacao {
+    left: 57.6%;
+}
+
+.btn-presentes {
+    left: 72.0%;
+}
+
+/* Animação Guia de Brilho nos botões */
+.overlay-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    border-radius: 50%;
+    border: 1px solid rgba(197, 160, 89, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.9);
+}
+
+.screen.active .overlay-btn::before {
+    animation: hintPulse 3s infinite ease-in-out;
+}
+
+/* Atrasos na animação para que brilhem em sequência fofa */
+.btn-confirmar::before { animation-delay: 0.5s !important; }
+.btn-dresscode::before { animation-delay: 1.0s !important; }
+.btn-localizacao::before { animation-delay: 1.5s !important; }
+.btn-presentes::before { animation-delay: 2.0s !important; }
+
+@keyframes hintPulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.25);
+        opacity: 0;
+    }
+}
+
+/* Rodapé do Convite */
+.invitation-footer {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    letter-spacing: 0.5px;
+    animation: textPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes textPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* ==========================================================================
+   5. ESTILIZAÇÃO DOS MODAIS (OVERLAY & GLASSMORPHISM CONTAINER)
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(74, 59, 50, 0.35);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Mobile Bottom Sheet */
+    transition: opacity var(--transition-normal);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-container {
+    width: 100%;
+    max-width: 480px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    box-shadow: 0 -10px 40px rgba(74, 59, 50, 0.15);
+    border-radius: 28px 28px 0 0;
+    padding: 35px 25px 40px;
+    transform: translateY(100%);
+    transition: transform var(--transition-normal);
+    position: relative;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modal-overlay.active .modal-container {
+    transform: translateY(0);
+}
+
+/* Botão Fechar Modal */
+.btn-close-modal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(74, 59, 50, 0.08);
+    border: none;
+    color: var(--color-text-main);
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.btn-close-modal:active {
+    background: rgba(74, 59, 50, 0.15);
+}
+
+/* Cabeçalho do Modal */
+.modal-header {
+    text-align: center;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--color-bg-cream);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    color: var(--color-gold-dark);
+}
+
+.modal-icon {
+    width: 26px;
+    height: 26px;
+}
+
+.modal-header h2 {
+    font-family: var(--font-accent);
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+    margin-bottom: 4px;
+}
+
+.modal-header h3 {
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: var(--color-gold-dark);
+    letter-spacing: 1px;
+}
+
+/* Corpo do Modal */
+.modal-body {
+    color: var(--color-text-main);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Estilos Específicos: Dress Code */
+.dresscode-intro {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 300;
+}
+
+.dresscode-details {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.dresscode-item {
+    margin-bottom: 15px;
+}
+
+.dresscode-item strong {
+    font-family: var(--font-accent);
+    color: var(--color-gold-dark);
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.dresscode-item p {
+    color: var(--color-text-main);
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+.dresscode-colors strong {
+    font-family: var(--font-accent);
+    color: var(--color-gold-dark);
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.dresscode-colors p {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.color-palette {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.color-swatch {
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(74, 59, 50, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.color-swatch span {
+    position: absolute;
+    bottom: 6px;
+    font-size: 0.65rem;
+    letter-spacing: 0.2px;
+}
+
+.color-swatch.beige {
+    background-color: #f3e9dc;
+    color: #8c7662;
+}
+
+.color-swatch.blue-pastel {
+    background-color: var(--color-blue-soft);
+    color: var(--color-blue-dark);
+}
+
+.color-swatch.pink-pastel {
+    background-color: var(--color-pink-soft);
+    color: var(--color-pink-dark);
+}
+
+.color-swatch.white {
+    background-color: #ffffff;
+    color: var(--color-text-muted);
+}
+
+.dresscode-tip {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* Estilos Específicos: Lista de Presentes */
+.diaper-suggestions {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    text-align: center;
+}
+
+.diaper-suggestions h4 {
+    font-family: var(--font-accent);
+    color: var(--color-gold-dark);
+    font-size: 1rem;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.diaper-sizes {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.size-badge {
+    background-color: var(--color-bg-cream);
+    color: var(--color-text-main);
+    font-family: var(--font-accent);
+    font-size: 1.1rem;
+    font-weight: 600;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed var(--color-gold);
+    box-shadow: 0 4px 10px rgba(197, 160, 89, 0.05);
+}
+
+.brands-text {
+    font-size: 0.85rem;
+    color: var(--color-text-main);
+}
+
+.brands-text strong {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background-color: rgba(74, 59, 50, 0.1);
+    z-index: 1;
+}
+
+.divider span {
+    background-color: var(--color-bg-cream);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    position: relative;
+    z-index: 2;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.pix-gift-area {
+    text-align: center;
+}
+
+.pix-gift-area h4 {
+    font-family: var(--font-accent);
+    color: var(--color-gold-dark);
+    font-size: 1rem;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.pix-subtitle {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 15px;
+}
+
+.pix-code-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-wood-frame);
+    border-radius: 12px;
+    padding: 8px 8px 8px 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(74, 59, 50, 0.04);
+}
+
+#pix-key-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-main);
+    word-break: break-all;
+    text-align: left;
+}
+
+.btn-copy {
+    background-color: var(--color-gold);
+    color: var(--color-white);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: var(--font-accent);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: background-color var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.btn-copy:active {
+    background-color: var(--color-gold-dark);
+}
+
+.btn-copy.copied {
+    background-color: #55a630;
+}
+
+.icon-copy {
+    width: 14px;
+    height: 14px;
+}
+
+.pix-recipient {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* ==========================================================================
+   SUPORTE PARA TELA MAIOR (TABLET & DESKTOP)
+   ========================================================================== */
+@media (min-width: 500px) {
+    body {
+        background-color: #efe6dc;
+    }
+    
+    .screen {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+        background-color: var(--color-bg-light);
+    }
+    
+    #loading-screen {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #video-screen {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #modal-dresscode, #modal-gifts {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+        align-items: center;
+        padding: 20px;
+    }
+
+    .modal-container {
+        border-radius: 24px;
+        max-height: 80vh;
+        animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        transform: translateY(0) scale(0.95);
+        opacity: 0;
+    }
+
+    .modal-overlay.active .modal-container {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    @keyframes scaleUp {
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+}
