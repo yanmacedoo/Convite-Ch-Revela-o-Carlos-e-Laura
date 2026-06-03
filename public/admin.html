@@ -211,6 +211,25 @@
             color: var(--color-white);
         }
 
+        .btn-reset-db {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--color-red);
+            background-color: var(--color-white);
+            color: var(--color-red);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-reset-db:hover {
+            background-color: var(--color-red);
+            color: var(--color-white);
+        }
+
         /* Cards de Estatísticas */
         .stats-grid {
             display: grid;
@@ -471,12 +490,20 @@
                 <h1>Confirmações de Presença</h1>
                 <div id="db-status" class="db-status-badge">Detectando banco...</div>
             </div>
-            <button id="btn-export-csv" class="btn-export">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 18px; height: 18px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                </svg>
-                Exportar Excel (CSV)
-            </button>
+            <div class="admin-header-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="btn-export-csv" class="btn-export">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 18px; height: 18px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    Exportar Excel (CSV)
+                </button>
+                <button id="btn-reset-database" class="btn-reset-db">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                    Zerar Painel Admin
+                </button>
+            </div>
         </div>
 
         <!-- Estatísticas Rápidas -->
@@ -579,6 +606,73 @@
             
             // Configura exportação CSV
             document.getElementById("btn-export-csv").addEventListener("click", exportToCSV);
+            
+            // Configura o botão de zerar banco de dados
+            document.getElementById("btn-reset-database").addEventListener("click", resetDatabase);
+        }
+
+        // Função para zerar todo o banco de dados (confirmações e palpites)
+        function resetDatabase() {
+            if (!confirm("ATENÇÃO: Esta ação é irreversível e irá apagar permanentemente todas as confirmações de presença e os palpites da enquete. Deseja continuar?")) {
+                return;
+            }
+            
+            const confirmationWord = prompt("Para confirmar, digite ZERAR em letras maiúsculas:");
+            if (confirmationWord !== "ZERAR") {
+                alert("Ação cancelada. A palavra de confirmação digitada estava incorreta.");
+                return;
+            }
+
+            // 1. Limpa LocalStorage
+            localStorage.removeItem("confirmacoes");
+            localStorage.removeItem("palpites");
+            
+            // 2. Limpa o Firebase Firestore (se ativo)
+            if (isFirebaseMode && db) {
+                const btnReset = document.getElementById("btn-reset-database");
+                const originalText = btnReset.innerHTML;
+                btnReset.disabled = true;
+                btnReset.textContent = "Apagando dados...";
+
+                // Apaga coleção 'confirmacoes' em batch
+                db.collection("confirmacoes").get()
+                    .then((querySnapshot) => {
+                        const batch = db.batch();
+                        querySnapshot.forEach((doc) => {
+                            batch.delete(doc.ref);
+                        });
+                        return batch.commit();
+                    })
+                    .then(() => {
+                        console.log("Confirmações excluídas do Firestore.");
+                        // Apaga coleção 'palpites' em batch
+                        return db.collection("palpites").get();
+                    })
+                    .then((querySnapshot) => {
+                        const batch = db.batch();
+                        querySnapshot.forEach((doc) => {
+                            batch.delete(doc.ref);
+                        });
+                        return batch.commit();
+                    })
+                    .then(() => {
+                        console.log("Palpites excluídos do Firestore.");
+                        btnReset.disabled = false;
+                        btnReset.innerHTML = originalText;
+                        alert("Todas as confirmações e palpites foram excluídos do Firebase com sucesso!");
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao zerar dados do Firebase:", error);
+                        btnReset.disabled = false;
+                        btnReset.innerHTML = originalText;
+                        alert("Ocorreu um erro ao excluir os dados do Firebase: " + error.message);
+                    });
+            } else {
+                // Modo LocalStorage
+                loadLocalStorageData();
+                loadLocalStoragePollData();
+                alert("Dados locais do LocalStorage (Modo Demo) foram zerados com sucesso!");
+            }
         }
 
         // Detecta se usa Firebase ou LocalStorage

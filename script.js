@@ -83,6 +83,7 @@ function initDOMReferences() {
     DOM.pollOverlay = document.getElementById("poll-overlay");
     DOM.pollVoteContainer = document.getElementById("poll-vote-container");
     DOM.pollResultContainer = document.getElementById("poll-result-container");
+    DOM.btnClosePoll = document.getElementById("btn-close-poll");
     
     // Referências do Modal de RSVP (Confirmação de Presença)
     DOM.modalConfirm = document.getElementById("modal-confirm");
@@ -555,6 +556,13 @@ function setupEventListeners() {
     if (btnPollGirl) {
         btnPollGirl.addEventListener("click", () => {
             registerPollVote("girl");
+        });
+    }
+    if (DOM.btnClosePoll) {
+        DOM.btnClosePoll.addEventListener("click", () => {
+            if (DOM.pollOverlay) {
+                DOM.pollOverlay.classList.remove("active");
+            }
         });
     }
 
