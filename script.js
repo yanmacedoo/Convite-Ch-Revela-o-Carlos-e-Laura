@@ -522,6 +522,26 @@ function setupEventListeners() {
             }, 400);
         });
     }
+
+    // --- Bloqueio Completo de Zoom (Pinch-to-zoom, gesto no iOS e Scroll Zoom) ---
+    // Bloqueia pinch-to-zoom (dois ou mais dedos) no Android/Chrome
+    document.addEventListener("touchstart", (e) => {
+        if (e.touches.length > 1) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Bloqueia gestos de zoom (pinch/rotate) nativos no iOS Safari
+    document.addEventListener("gesturestart", (e) => {
+        e.preventDefault();
+    }, { passive: false });
+
+    // Bloqueia zoom por atalho do teclado + mouse/trackpad wheel (Ctrl + Wheel) em desktops
+    document.addEventListener("wheel", (e) => {
+        if (e.ctrlKey) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 }
 
 // Cria um campo de texto dinâmico para acompanhante com botão de remoção
