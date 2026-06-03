@@ -8,8 +8,7 @@ const CONFIG = {
     // Mensagem padrão de confirmação no WhatsApp
     whatsappMessage: "Olá! Gostaria de confirmar minha presença no Chá Revelação do Carlos André e Laura! 💖💙",
     
-    // Link do Google Maps para o local do evento (Praia de Pratigi)
-    locationMapsUrl: "https://maps.google.com/?q=Praia+de+Pratigi", // SUBSTITUA pelo link exato se necessário
+
     
     // Chave PIX dos pais para presentes virtuais/fraldas
     pixKey: "charevelacao@email.com", // SUBSTITUA pela chave correta
@@ -32,6 +31,10 @@ const CONFIG = {
 const blobUrls = {};
 let isMuted = false;
 let currentVolume = 0.5;
+
+// Variáveis de Banco de Dados (Firebase ou LocalStorage)
+let db = null;
+let isFirebaseMode = false;
 
 // Variáveis da Web Audio API para tocar música em paralelo no iOS sem conflito com o vídeo
 let audioCtx = null;
@@ -72,6 +75,16 @@ function initDOMReferences() {
     
     DOM.particlesContainer = document.getElementById("particles-js");
     DOM.transitionOverlay = document.getElementById("white-transition-overlay");
+    
+    // Referências do Modal de RSVP (Confirmação de Presença)
+    DOM.modalConfirm = document.getElementById("modal-confirm");
+    DOM.btnOpenConfirm = document.getElementById("btn-open-confirm");
+    DOM.rsvpForm = document.getElementById("rsvp-form");
+    DOM.btnAddCompanion = document.getElementById("btn-add-companion");
+    DOM.companionsContainer = document.getElementById("companions-container");
+    DOM.rsvpFormContainer = document.getElementById("rsvp-form-container");
+    DOM.rsvpSuccessContainer = document.getElementById("rsvp-success-container");
+    DOM.btnCloseSuccess = document.getElementById("btn-close-success");
 }
 
 /* ==========================================================================
@@ -89,7 +102,10 @@ function init() {
         return;
     }
 
-    // 2. Definir links dinâmicos no HTML
+    // 2. Inicializa o Banco de Dados (Firebase ou LocalStorage)
+    initDatabase();
+
+    // 3. Definir links dinâmicos no HTML
     if (DOM.btnConfirmar) {
         DOM.btnConfirmar.href = `https://api.whatsapp.com/send?phone=${CONFIG.whatsappNumber}&text=${encodeURIComponent(CONFIG.whatsappMessage)}`;
     }
@@ -100,10 +116,10 @@ function init() {
         DOM.pixKeyText.textContent = CONFIG.pixKey;
     }
     
-    // 3. Configurar ouvintes de eventos
+    // 4. Configurar ouvintes de eventos
     setupEventListeners();
     
-    // 4. Iniciar pré-carregamento das mídias
+    // 5. Iniciar pré-carregamento das mídias
     preloadMedia();
 }
 
@@ -390,32 +406,71 @@ function fadeAudioVolume(audio, targetVolume, duration = 1500) {
 }
 
 /* ==========================================================================
-   INTERATIVIDADE E CONTROLES (VOLUME, MODAIS, COPIAR)
+   INTERATIVIDADE E GERENCIAMENTO DE DADOS
    ========================================================================== */
+
+// Inicializa o Firebase Firestore ou define o modo de compatibilidade LocalStorage
+function initDatabase() {
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "SUA_API_KEY") {
+        try {
+            // Inicializa o Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            db = firebase.firestore();
+            isFirebaseMode = true;
+            console.log("Firebase Firestore inicializado com sucesso.");
+        } catch (e) {
+            console.error("Erro ao inicializar o Firebase. Usando modo de compatibilidade LocalStorage:", e);
+            isFirebaseMode = false;
+        }
+    } else {
+        isFirebaseMode = false;
+        console.log("Credenciais do Firebase não configuradas. Rodando no modo LocalStorage.");
+    }
+}
+
+// Configura os ouvintes de eventos
 function setupEventListeners() {
     // Clique na tela do envelope
-    DOM.btnOpenInvitation.addEventListener("click", () => {
-        startInvitationFlow();
-    });
+    if (DOM.btnOpenInvitation) {
+        DOM.btnOpenInvitation.addEventListener("click", () => {
+            startInvitationFlow();
+        });
+    }
     
     // Clique para pular o vídeo
-    DOM.btnSkipVideo.addEventListener("click", () => {
-        transitionToMainInvitation();
-    });
+    if (DOM.btnSkipVideo) {
+        DOM.btnSkipVideo.addEventListener("click", () => {
+            transitionToMainInvitation();
+        });
+    }
     
     // Controle de volume (mutar/desmutar)
-    DOM.btnVolumeControl.addEventListener("click", () => {
-        toggleMute();
-    });
+    if (DOM.btnVolumeControl) {
+        DOM.btnVolumeControl.addEventListener("click", () => {
+            toggleMute();
+        });
+    }
     
     // Modais - Abertura
-    DOM.btnOpenDressCode.addEventListener("click", () => {
-        openModal(DOM.modalDressCode);
-    });
+    if (DOM.btnOpenConfirm) {
+        DOM.btnOpenConfirm.addEventListener("click", () => {
+            openModal(DOM.modalConfirm);
+        });
+    }
     
-    DOM.btnOpenGifts.addEventListener("click", () => {
-        openModal(DOM.modalGifts);
-    });
+    if (DOM.btnOpenDressCode) {
+        DOM.btnOpenDressCode.addEventListener("click", () => {
+            openModal(DOM.modalDressCode);
+        });
+    }
+    
+    if (DOM.btnOpenGifts) {
+        DOM.btnOpenGifts.addEventListener("click", () => {
+            openModal(DOM.modalGifts);
+        });
+    }
     
     // Modais - Fechamento
     document.querySelectorAll(".btn-close-modal").forEach(btn => {
@@ -433,11 +488,142 @@ function setupEventListeners() {
         });
     });
     
-    // Copiar chave PIX
+    // Copiar chave PIX (Se o botão existir)
     if (DOM.btnCopyPix) {
         DOM.btnCopyPix.addEventListener("click", () => {
             copyPixKey();
         });
+    }
+
+    // --- Ouvintes do Modal de RSVP (Confirmação de Presença) ---
+    if (DOM.btnAddCompanion) {
+        DOM.btnAddCompanion.addEventListener("click", () => {
+            addCompanionInput();
+        });
+    }
+
+    if (DOM.rsvpForm) {
+        DOM.rsvpForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            submitRSVP();
+        });
+    }
+
+    if (DOM.btnCloseSuccess) {
+        DOM.btnCloseSuccess.addEventListener("click", () => {
+            closeModal(DOM.modalConfirm);
+            // Reseta o modal de confirmação para o estado inicial de formulário após fechar
+            setTimeout(() => {
+                DOM.rsvpFormContainer.style.display = "block";
+                DOM.rsvpSuccessContainer.style.display = "none";
+                DOM.rsvpForm.reset();
+                if (DOM.companionsContainer) DOM.companionsContainer.innerHTML = "";
+            }, 400);
+        });
+    }
+}
+
+// Cria um campo de texto dinâmico para acompanhante com botão de remoção
+function addCompanionInput() {
+    if (!DOM.companionsContainer) return;
+    
+    const row = document.createElement("div");
+    row.className = "companion-input-row";
+    
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "input-field companion-name-input";
+    input.placeholder = "Nome do acompanhante";
+    input.required = true;
+    
+    const btnRemove = document.createElement("button");
+    btnRemove.type = "button";
+    btnRemove.className = "btn-remove-companion";
+    btnRemove.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 16px; height: 16px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    `;
+    
+    btnRemove.onclick = function() {
+        row.style.animation = "slideDown 0.2s reverse cubic-bezier(0.16, 1, 0.3, 1) forwards";
+        setTimeout(() => {
+            row.remove();
+        }, 200);
+    };
+    
+    row.appendChild(input);
+    row.appendChild(btnRemove);
+    DOM.companionsContainer.appendChild(row);
+    
+    // Foca automaticamente no campo criado
+    input.focus();
+}
+
+// Envia a confirmação de presença (salva no Firestore ou no LocalStorage)
+function submitRSVP() {
+    const guestNameInput = document.getElementById("guest-name");
+    if (!guestNameInput) return;
+    
+    const guestName = guestNameInput.value.trim();
+    if (!guestName) return;
+    
+    // Coleta o nome de todos os acompanhantes
+    const companionInputs = document.querySelectorAll(".companion-name-input");
+    const companions = [];
+    companionInputs.forEach(input => {
+        const name = input.value.trim();
+        if (name) companions.push(name);
+    });
+    
+    // Objeto padrão de dados para gravação
+    const rsvpId = Math.random().toString(36).substr(2, 9); // ID temporário para o modo LocalStorage
+    
+    if (isFirebaseMode && db) {
+        // Modo Firebase Cloud: Grava no Firestore
+        db.collection("confirmacoes").add({
+            nome: guestName,
+            acompanhantes: companions,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            console.log("Presença registrada no Firestore.");
+            showRsvpSuccess();
+        })
+        .catch(err => {
+            console.error("Falha ao salvar no Firestore. Salvando localmente como backup:", err);
+            saveToLocalStorage({ id: rsvpId, nome: guestName, acompanhantes: companions, timestamp: new Date().toISOString() });
+        });
+    } else {
+        // Modo Demo: Salva localmente no navegador
+        saveToLocalStorage({ id: rsvpId, nome: guestName, acompanhantes: companions, timestamp: new Date().toISOString() });
+    }
+}
+
+// Salva a presença no LocalStorage (Modo Demo ou Backup offline)
+function saveToLocalStorage(data) {
+    try {
+        let stored = localStorage.getItem("confirmacoes");
+        let list = [];
+        if (stored) {
+            list = JSON.parse(stored);
+        }
+        list.push(data);
+        localStorage.setItem("confirmacoes", JSON.stringify(list));
+        console.log("Presença salva localmente no LocalStorage.");
+        showRsvpSuccess();
+    } catch (e) {
+        console.error("Erro ao gravar no LocalStorage:", e);
+        // Exibe tela de sucesso de qualquer forma para o usuário final
+        showRsvpSuccess();
+    }
+}
+
+// Exibe a tela de sucesso (feedback visual premium)
+function showRsvpSuccess() {
+    if (DOM.rsvpFormContainer && DOM.rsvpSuccessContainer) {
+        DOM.rsvpFormContainer.style.display = "none";
+        DOM.rsvpSuccessContainer.style.display = "block";
     }
 }
 

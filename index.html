@@ -12,6 +12,13 @@
     
     <!-- CSS Estilos -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase SDK (v9 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Arquivo de Configuração Compartilhado -->
+    <script src="firebase-config.js"></script>
 </head>
 <body>
 
@@ -83,9 +90,9 @@
                 <!-- Overlay de Áreas Clicáveis -->
                 <div class="buttons-overlay">
                     <!-- Botão 1: Confirmar Presença (Ursinho) -->
-                    <a href="#" id="btn-whatsapp-confirm" class="overlay-btn btn-confirmar" aria-label="Confirmar Presença no WhatsApp">
+                    <button id="btn-open-confirm" class="overlay-btn btn-confirmar" aria-label="Confirmar Presença">
                         <span class="btn-ripple"></span>
-                    </a>
+                    </button>
                     
                     <!-- Botão 2: Dress Code (Vestidinho) -->
                     <button id="btn-open-dresscode" class="overlay-btn btn-dresscode" aria-label="Visualizar Dress Code">
@@ -110,6 +117,70 @@
     <div id="white-transition-overlay" class="white-transition"></div>
 
     <!-- 5. Modais Premium (Glassmorphism & iOS style sheets) -->
+    
+    <!-- Modal: Confirmar Presença (RSVP) -->
+    <div id="modal-confirm" class="modal-overlay">
+        <div class="modal-container">
+            <button class="btn-close-modal" aria-label="Fechar Modal">✕</button>
+            
+            <!-- Formulário de RSVP -->
+            <div id="rsvp-form-container">
+                <div class="modal-header">
+                    <div class="modal-icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="modal-icon">
+                            <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.47 5.35a1.5 1.5 0 01-1.6 0L1.5 8.67z" />
+                            <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 6.137a.75.75 0 00.804 0L22.5 6.908z" />
+                        </svg>
+                    </div>
+                    <h2>Confirmar Presença</h2>
+                    <h3>Chá de Fraldas & Revelação</h3>
+                </div>
+                <div class="modal-body">
+                    <form id="rsvp-form">
+                        <div class="input-group">
+                            <label class="input-label" for="guest-name">Seu Nome Completo</label>
+                            <input class="input-field" type="text" id="guest-name" placeholder="Digite seu nome" required>
+                        </div>
+                        
+                        <div class="companions-section">
+                            <label class="input-label">Acompanhantes (Família)</label>
+                            <p class="companions-subtitle">Adicione os membros da família que irão com você:</p>
+                            
+                            <div id="companions-container" class="companions-inputs">
+                                <!-- Inputs de acompanhantes serão criados dinamicamente via JS -->
+                            </div>
+                            
+                            <button type="button" id="btn-add-companion" class="btn-add-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 14px; height: 14px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                Adicionar Acompanhante
+                            </button>
+                        </div>
+                        
+                        <button type="submit" class="btn-submit-rsvp">Confirmar Minha Presença</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tela de Sucesso (Feedback Visual Premium) -->
+            <div id="rsvp-success-container" style="display: none; text-align: center; animation: fadeIn 0.4s ease-in-out;">
+                <div class="modal-header" style="margin-bottom: 15px;">
+                    <div class="success-checkmark-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="success-icon">
+                            <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.748-5.25z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <h2 style="color: var(--color-gold-dark);">Presença Confirmada!</h2>
+                    <h3>Obrigado por confirmar</h3>
+                </div>
+                <div class="modal-body" style="padding: 10px 0;">
+                    <p style="font-size: 1.05rem; margin-bottom: 20px;">Sua presença foi salva com sucesso. Mal podemos esperar para viver este momento especial com você! 💖💙</p>
+                    <button id="btn-close-success" class="btn-submit-rsvp" style="background-color: var(--color-gold);">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Modal: Dress Code -->
     <div id="modal-dresscode" class="modal-overlay">
