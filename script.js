@@ -26,57 +26,86 @@ const CONFIG = {
 /* ==========================================================================
    VARIÁVEIS DE ESTADO GLOBAL
    ========================================================================== */
+/* ==========================================================================
+   VARIÁVEIS DE ESTADO GLOBAL E REFERÊNCIAS DO DOM
+   ========================================================================== */
 const blobUrls = {};
 let isMuted = false;
 let currentVolume = 0.5;
 
-// Seletores do DOM
-const DOM = {
-    loadingScreen: document.getElementById("loading-screen"),
-    envelopeScreen: document.getElementById("envelope-screen"),
-    videoScreen: document.getElementById("video-screen"),
-    invitationScreen: document.getElementById("invitation-screen"),
+// Objeto global que conterá as referências do DOM após a inicialização
+const DOM = {};
+
+function initDOMReferences() {
+    DOM.loadingScreen = document.getElementById("loading-screen");
+    DOM.envelopeScreen = document.getElementById("envelope-screen");
+    DOM.videoScreen = document.getElementById("video-screen");
+    DOM.invitationScreen = document.getElementById("invitation-screen");
     
-    progressBar: document.getElementById("loader-progress-bar"),
-    progressPercentage: document.getElementById("loader-percentage"),
-    btnOpenInvitation: document.getElementById("btn-open-invitation"),
+    DOM.progressBar = document.getElementById("loader-progress-bar");
+    DOM.progressPercentage = document.getElementById("loader-percentage");
+    DOM.btnOpenInvitation = document.getElementById("btn-open-invitation");
     
-    introVideo: document.getElementById("intro-video"),
-    btnSkipVideo: document.getElementById("btn-skip-video"),
+    DOM.introVideo = document.getElementById("intro-video");
+    DOM.btnSkipVideo = document.getElementById("btn-skip-video");
     
-    bgMusic: document.getElementById("bg-music"),
-    btnVolumeControl: document.getElementById("btn-volume-control"),
+    DOM.bgMusic = document.getElementById("bg-music");
+    DOM.btnVolumeControl = document.getElementById("btn-volume-control");
     
-    btnConfirmar: document.getElementById("btn-whatsapp-confirm"),
-    btnLocalizacao: document.getElementById("btn-maps-location"),
+    DOM.btnConfirmar = document.getElementById("btn-whatsapp-confirm");
+    DOM.btnLocalizacao = document.getElementById("btn-maps-location");
     
-    btnOpenDressCode: document.getElementById("btn-open-dresscode"),
-    btnOpenGifts: document.getElementById("btn-open-gifts"),
+    DOM.btnOpenDressCode = document.getElementById("btn-open-dresscode");
+    DOM.btnOpenGifts = document.getElementById("btn-open-gifts");
     
-    modalDressCode: document.getElementById("modal-dresscode"),
-    modalGifts: document.getElementById("modal-gifts"),
+    DOM.modalDressCode = document.getElementById("modal-dresscode");
+    DOM.modalGifts = document.getElementById("modal-gifts");
     
-    btnCopyPix: document.getElementById("btn-copy-pix"),
-    pixKeyText: document.getElementById("pix-key-text"),
+    DOM.btnCopyPix = document.getElementById("btn-copy-pix");
+    DOM.pixKeyText = document.getElementById("pix-key-text");
     
-    particlesContainer: document.getElementById("particles-js")
-};
+    DOM.particlesContainer = document.getElementById("particles-js");
+}
 
 /* ==========================================================================
    INICIALIZAÇÃO DO SITE E PRÉ-CARREGAMENTO
    ========================================================================== */
-document.addEventListener("DOMContentLoaded", () => {
-    // Definir links dinâmicos no HTML
-    DOM.btnConfirmar.href = `https://api.whatsapp.com/send?phone=${CONFIG.whatsappNumber}&text=${encodeURIComponent(CONFIG.whatsappMessage)}`;
-    DOM.btnLocalizacao.href = CONFIG.locationMapsUrl;
-    DOM.pixKeyText.textContent = CONFIG.pixKey;
+function init() {
+    console.log("Inicializando convite digital...");
     
-    // Iniciar pré-carregamento
-    preloadMedia();
+    // 1. Inicializa todas as referências do DOM de forma segura
+    initDOMReferences();
     
-    // Configurar ouvintes de eventos
+    // Valida se os elementos vitais do loader estão presentes
+    if (!DOM.loadingScreen || !DOM.progressPercentage || !DOM.progressBar) {
+        console.error("Erro crítico: Elementos de carregamento não encontrados no DOM.");
+        return;
+    }
+
+    // 2. Definir links dinâmicos no HTML
+    if (DOM.btnConfirmar) {
+        DOM.btnConfirmar.href = `https://api.whatsapp.com/send?phone=${CONFIG.whatsappNumber}&text=${encodeURIComponent(CONFIG.whatsappMessage)}`;
+    }
+    if (DOM.btnLocalizacao) {
+        DOM.btnLocalizacao.href = CONFIG.locationMapsUrl;
+    }
+    if (DOM.pixKeyText) {
+        DOM.pixKeyText.textContent = CONFIG.pixKey;
+    }
+    
+    // 3. Configurar ouvintes de eventos
     setupEventListeners();
-});
+    
+    // 4. Iniciar pré-carregamento das mídias
+    preloadMedia();
+}
+
+// Inicialização segura à prova de falhas de carregamento diferido (Vite / defer)
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+} else {
+    init();
+}
 
 /* ==========================================================================
    LÓGICA DE PRÉ-CARREGAMENTO COM PROGRESSO REAL
