@@ -225,19 +225,27 @@ function startInvitationFlow() {
     DOM.introVideo.src = CONFIG.mediaFiles.find(f => f.id === "video").url;
     DOM.bgMusic.src = CONFIG.mediaFiles.find(f => f.id === "music").url;
     
-    // Configura volumes iniciais
-    DOM.bgMusic.volume = 0.5;
+    // Configura volumes iniciais (Música a 30% de volume, Vídeo a 100%)
+    DOM.bgMusic.volume = 0.3;
     DOM.introVideo.volume = 1.0;
     
-    // Tenta reproduzir a música e o vídeo simultaneamente
-    // Nota: Como o usuário acabou de interagir (clique no envelope), o play() é permitido.
+    // Inicia a música de fundo primeiro. Ao dar certo, aguarda 150ms para iniciar o vídeo.
+    // Esse micro-atraso dá tempo para o iOS alocar o canal de áudio e mixar ambas as mídias sem bloqueios.
     DOM.bgMusic.play()
-        .then(() => console.log("Música de fundo inicializada."))
-        .catch(e => console.log("Áudio de fundo bloqueado ou falhou:", e));
-        
-    DOM.introVideo.play()
-        .then(() => console.log("Vídeo de abertura iniciado."))
-        .catch(e => console.log("Vídeo bloqueado ou falhou:", e));
+        .then(() => {
+            console.log("Música de fundo iniciada com sucesso.");
+            setTimeout(() => {
+                DOM.introVideo.play()
+                    .then(() => console.log("Vídeo de abertura iniciado com sucesso."))
+                    .catch(e => console.log("Vídeo bloqueado pelo navegador:", e));
+            }, 150);
+        })
+        .catch(e => {
+            console.warn("Música falhou ao iniciar no envelope. Iniciando vídeo...", e);
+            // Fallback: se a música falhar, inicia o vídeo imediatamente
+            DOM.introVideo.play()
+                .catch(e => console.log("Vídeo bloqueado pelo navegador:", e));
+        });
     
     // Transiciona as telas
     DOM.envelopeScreen.classList.remove("active");
